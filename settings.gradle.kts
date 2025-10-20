@@ -1,1 +1,1 @@
-rootProject.name = "hojunnnnn"
+rootProject.name = "coupon-issue-service"
