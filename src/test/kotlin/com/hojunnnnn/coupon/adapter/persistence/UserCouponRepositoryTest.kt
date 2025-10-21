@@ -12,15 +12,12 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 @DataJpaTest
 class UserCouponRepositoryTest {
 
-    @Autowired private lateinit var couponJpaRepository: CouponJpaRepository
     @Autowired private lateinit var userCouponJpaRepository: UserCouponJpaRepository
 
-    private lateinit var couponRepository: CouponRepository
     private lateinit var userCouponRepository: UserCouponRepository
 
     @BeforeEach
     fun init() {
-        couponRepository = CouponPersistenceAdapter(couponJpaRepository)
         userCouponRepository = UserCouponPersistenceAdapter(userCouponJpaRepository)
     }
 
@@ -28,17 +25,17 @@ class UserCouponRepositoryTest {
     fun `유저는 쿠폰을 발급 받을 수 있다`() {
         // given
         val userId = "user1"
-        val savedCoupon = couponRepository.save(Coupon(
+        val coupon = Coupon(
             name = "TEST_COUPON",
             quantity = 10
-        ))
+        )
 
         // when
-        val issuedCoupon = userCouponRepository.issueCouponTo(userId, savedCoupon)
+        val issuedCoupon = userCouponRepository.issueCouponTo(userId, coupon)
 
         // then
         assertThat(issuedCoupon).isNotNull()
-        assertThat(issuedCoupon.couponId).isEqualTo(savedCoupon.id)
+        assertThat(issuedCoupon.couponId).isEqualTo(coupon.id)
     }
 
 }
