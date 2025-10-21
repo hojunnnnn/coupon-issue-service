@@ -23,4 +23,8 @@ class UserCouponPersistenceAdapter(
         return userCouponJpaRepository.save(userCoupon)
     }
 
+    override fun isAlreadyIssuedCoupon(userId: String, couponId: Long): Boolean {
+        return userCouponJpaRepository.existsByUserIdAndCouponId(userId, couponId)
+    }
+
 }

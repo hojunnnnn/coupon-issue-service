@@ -12,4 +12,8 @@ interface CouponRepository {
 
     fun existsByName(name: String): Boolean
 
+    fun findById(id: Long): Coupon?
+
+    fun countByName(name: String): Long
+
 }
