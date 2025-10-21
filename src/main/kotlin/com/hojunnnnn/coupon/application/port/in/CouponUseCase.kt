@@ -1,6 +1,5 @@
 package com.hojunnnnn.coupon.application.port.`in`
 
-import com.hojunnnnn.coupon.application.port.`in`.CouponCreateResponse
 
 /**
  * 쿠폰 유스케이스 인터페이스
