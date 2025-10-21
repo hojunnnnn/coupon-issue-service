@@ -5,10 +5,12 @@ import com.hojunnnnn.coupon.application.port.`in`.CouponCreateResponse
 import com.hojunnnnn.coupon.application.port.`in`.CouponUseCase
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.Pattern
 import jakarta.validation.constraints.Positive
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.BDDMockito.given
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
@@ -68,10 +70,46 @@ class CouponControllerTest {
         }
 
     }
+
+    @ParameterizedTest
+    @ValueSource(ints = [-1, 0, -100])
+    fun `수량이 0 이하일 때 BadRequest를 반환한다`(quantity: Int) {
+        // given
+        val name = "TEST_COUPON"
+
+        // when
+        val resultActions = mockMvc.perform(
+            MockMvcRequestBuilders.post(url)
+                .content(Gson().toJson(CouponCreateRequest(name = name, quantity = quantity)))
+                .contentType(MediaType.APPLICATION_JSON)
+        )
+
+        // then
+        resultActions.andExpect(status().isBadRequest())
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = ["", "  ", "a  b"])
+    fun `이름에 공백을 포함하면 BadRequest를 반환한다`(name: String) {
+        // given
+        val quantity = 100
+
+        // when
+        val resultActions = mockMvc.perform(
+            MockMvcRequestBuilders.post(url)
+                .content(Gson().toJson(CouponCreateRequest(name = name, quantity = quantity)))
+                .contentType(MediaType.APPLICATION_JSON)
+        )
+
+        // then
+        resultActions.andExpect(status().isBadRequest())
+    }
+
 }
 
 data class CouponCreateRequest(
     @field:NotBlank
+    @field:Pattern(regexp = "^\\S+$")
     val name: String,
 
     @field:Positive
@@ -87,7 +125,6 @@ class CouponController(
     fun createCoupon(@RequestBody @Valid request: CouponCreateRequest
     ): ResponseEntity<CouponCreateResponse> {
         val response = couponUseCase.createCoupon(request.name, request.quantity)
-        println("response: $response" )
         return ResponseEntity.ok(response)
     }
 
