@@ -1,5 +1,6 @@
 package com.hojunnnnn.coupon.adapter.web
 
+import com.hojunnnnn.coupon.adapter.web.HeaderKeys.USER_ID_HEADER
 import com.hojunnnnn.coupon.application.port.`in`.CouponCreateRequest
 import com.hojunnnnn.coupon.application.port.`in`.CouponCreateResponse
 import com.hojunnnnn.coupon.application.port.`in`.CouponUseCase
@@ -25,7 +26,7 @@ class CouponController(
 
     @PostMapping("/api/v1/coupons/{id}/issue")
     fun issueCoupon(
-        @RequestHeader("X-USER-ID") userId: String,
+        @RequestHeader(USER_ID_HEADER) userId: String,
         @PathVariable id: Long,
     ): ResponseEntity<Unit> {
         couponUseCase.issueCoupon(userId, id)
