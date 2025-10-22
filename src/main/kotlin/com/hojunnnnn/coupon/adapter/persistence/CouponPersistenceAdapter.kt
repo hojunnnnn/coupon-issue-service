@@ -2,6 +2,7 @@ package com.hojunnnnn.coupon.adapter.persistence
 
 import com.hojunnnnn.coupon.domain.Coupon
 import com.hojunnnnn.coupon.application.port.out.CouponRepository
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
 
 /**
@@ -19,6 +20,14 @@ class CouponPersistenceAdapter(
 
     override fun existsByName(name: String): Boolean {
         return couponJpaRepository.existsByName(name)
+    }
+
+    override fun findById(id: Long): Coupon {
+        return couponJpaRepository.findByIdOrNull(id) ?: throw Exception()
+    }
+
+    override fun countByName(name: String): Long {
+        return couponJpaRepository.countByName(name)
     }
 
 }

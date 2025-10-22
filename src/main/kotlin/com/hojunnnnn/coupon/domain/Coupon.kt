@@ -25,4 +25,15 @@ class Coupon(
     val expiredDateTime: LocalDateTime = LocalDateTime.now().plusDays(7),
 ) {
 
+    fun isExpired(currentDateTime: LocalDateTime): Boolean {
+        return currentDateTime.isAfter(expiredDateTime)
+    }
+
+    fun isSoldOut(): Boolean {
+        return quantity <= 0
+    }
+
+    fun decreaseQuantity() {
+        quantity -= 1
+    }
 }

@@ -32,13 +32,26 @@ class CouponService(
         )
     }
 
+    @Transactional
     override fun issueCoupon(userId: String, couponId: Long): UserCoupon {
-        val coupon = couponRepository.findById(couponId) ?: throw Exception()
-        if(coupon.quantity <= 0) { throw Exception() }
-        if(coupon.expiredDateTime.isBefore(LocalDateTime.now())) { throw Exception() }
-        if(userCouponRepository.isAlreadyIssuedCoupon(userId, couponId)) { throw Exception() }
+        val coupon = couponRepository.findById(couponId)
+        validateCoupon(coupon, userId)
+
+        coupon.decreaseQuantity()
 
         return userCouponRepository.issueCouponTo(userId, coupon)
+    }
+
+    private fun validateCoupon(coupon: Coupon, userId: String) {
+        if (coupon.isSoldOut()) {
+            throw Exception()
+        }
+        if (coupon.isExpired(LocalDateTime.now())) {
+            throw Exception()
+        }
+        if (userCouponRepository.isAlreadyIssuedCoupon(userId, coupon.id)) {
+            throw Exception()
+        }
     }
 
 }
