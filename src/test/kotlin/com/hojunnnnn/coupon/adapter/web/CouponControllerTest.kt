@@ -1,7 +1,7 @@
 package com.hojunnnnn.coupon.adapter.web
 
 import com.google.gson.Gson
-import com.hojunnnnn.coupon.adapter.web.HeaderKey.USER_ID_HEADER
+import com.hojunnnnn.coupon.adapter.web.HeaderKeys.USER_ID_HEADER
 import com.hojunnnnn.coupon.application.port.`in`.CouponCreateRequest
 import com.hojunnnnn.coupon.application.port.`in`.CouponCreateResponse
 import com.hojunnnnn.coupon.application.port.`in`.CouponUseCase
@@ -136,10 +136,6 @@ class CouponControllerTest {
     }
 
 
-}
-
-object HeaderKey {
-    const val USER_ID_HEADER = "X-USER-ID"
 }
 
 
