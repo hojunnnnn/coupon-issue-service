@@ -15,10 +15,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.http.MediaType
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import org.springframework.test.web.servlet.post
 import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
 
 @WebMvcTest(CouponController::class)
 class CouponControllerTest {
@@ -39,7 +38,7 @@ class CouponControllerTest {
             // given
             val name = "TEST_COUPON"
             val quantity = 100
-            val expiredDateTime = LocalDateTime.now().plusDays(7)
+            val expiredDateTime = LocalDateTime.now().plusDays(7).truncatedTo(ChronoUnit.MILLIS)
 
             given(couponUseCase.createCoupon(name, quantity))
                 .willReturn(CouponCreateResponse(
@@ -50,20 +49,19 @@ class CouponControllerTest {
                 ))
 
             // when
-            val resultActions = mockMvc.perform(
-                MockMvcRequestBuilders.post(url)
-                    .content(Gson().toJson(CouponCreateRequest(name = name, quantity = quantity)))
-                    .contentType(MediaType.APPLICATION_JSON)
-            )
-
-            // then
-            resultActions.andExpect {
-                status().isOk()
-                jsonPath("$.id").value(1L)
-                jsonPath("$.name").value(name)
-                jsonPath("$.quantity").value(quantity)
-                jsonPath("$.expiredDateTime").value(expiredDateTime)
+            val resultActions = mockMvc.post(url) {
+                contentType = MediaType.APPLICATION_JSON
+                content = Gson().toJson(CouponCreateRequest(name = name, quantity = quantity))
             }
+
+
+
+            resultActions
+                .andExpect { status { isOk() } }
+                .andExpect { jsonPath("$.id") { value(1L) } }
+                .andExpect { jsonPath("$.name") { value(name) } }
+                .andExpect { jsonPath("$.quantity") { value(quantity) } }
+                .andExpect { jsonPath("$.expiredDateTime") { value(expiredDateTime.toString()) } }
 
         }
 
@@ -74,14 +72,13 @@ class CouponControllerTest {
             val name = "TEST_COUPON"
 
             // when
-            val resultActions = mockMvc.perform(
-                MockMvcRequestBuilders.post(url)
-                    .content(Gson().toJson(CouponCreateRequest(name = name, quantity = quantity)))
-                    .contentType(MediaType.APPLICATION_JSON)
-            )
+            val resultActions = mockMvc.post(url) {
+                contentType = MediaType.APPLICATION_JSON
+                content = Gson().toJson(CouponCreateRequest(name = name, quantity = quantity))
+            }
 
             // then
-            resultActions.andExpect(status().isBadRequest())
+            resultActions.andExpect { status { isBadRequest() } }
         }
 
         @ParameterizedTest
@@ -91,14 +88,13 @@ class CouponControllerTest {
             val quantity = 100
 
             // when
-            val resultActions = mockMvc.perform(
-                MockMvcRequestBuilders.post(url)
-                    .content(Gson().toJson(CouponCreateRequest(name = name, quantity = quantity)))
-                    .contentType(MediaType.APPLICATION_JSON)
-            )
+            val resultActions = mockMvc.post(url) {
+                contentType = MediaType.APPLICATION_JSON
+                content = Gson().toJson(CouponCreateRequest(name = name, quantity = quantity))
+            }
 
             // then
-            resultActions.andExpect(status().isBadRequest())
+            resultActions.andExpect { status { isBadRequest() } }
         }
     }
 
@@ -108,30 +104,24 @@ class CouponControllerTest {
 
         @Test
         fun `사용자 식별값이 헤더에 존재하지 않으면 예외를 반환한다`() {
-            // when
-            val resultActions = mockMvc.perform(
-                MockMvcRequestBuilders.post(url)
-                    .contentType(MediaType.APPLICATION_JSON)
-            )
 
-            // then
-            resultActions.andExpect(status().isBadRequest())
+            val resultActions = mockMvc.post(url) {
+                contentType = MediaType.APPLICATION_JSON
+            }
+
+            resultActions.andExpect { status { isBadRequest() } }
         }
 
         @Test
         fun `성공`() {
-            // given
             val userId = "USER1"
 
-            // when
-            val resultActions = mockMvc.perform(
-                MockMvcRequestBuilders.post(url)
-                    .header(USER_ID_HEADER, userId)
-                    .contentType(MediaType.APPLICATION_JSON)
-            )
+            val resultActions = mockMvc.post(url) {
+                header(USER_ID_HEADER, userId)
+                contentType = MediaType.APPLICATION_JSON
+            }
 
-            // then
-            resultActions.andExpect(status().isOk())
+            resultActions.andExpect { status { isOk() } }
         }
     }
 
