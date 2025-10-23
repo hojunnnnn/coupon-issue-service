@@ -4,6 +4,7 @@ import com.hojunnnnn.coupon.adapter.web.HeaderKeys.USER_ID_HEADER
 import com.hojunnnnn.coupon.application.port.`in`.CouponCreateRequest
 import com.hojunnnnn.coupon.application.port.`in`.CouponCreateResponse
 import com.hojunnnnn.coupon.application.port.`in`.CouponUseCase
+import com.hojunnnnn.coupon.domain.UserCoupon
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PathVariable
@@ -28,9 +29,9 @@ class CouponController(
     fun issueCoupon(
         @RequestHeader(USER_ID_HEADER) userId: String,
         @PathVariable id: Long,
-    ): ResponseEntity<Unit> {
-        couponUseCase.issueCoupon(userId, id)
-        return ResponseEntity.ok().build()
+    ): ResponseEntity<UserCoupon> {
+        val response = couponUseCase.issueCoupon(userId, id)
+        return ResponseEntity.ok(response)
     }
 
 }
