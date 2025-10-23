@@ -2,6 +2,9 @@ package com.hojunnnnn.coupon.application.port.`in`
 
 import com.hojunnnnn.coupon.application.port.out.CouponRepository
 import com.hojunnnnn.coupon.application.port.out.UserCouponRepository
+import com.hojunnnnn.coupon.application.service.CouponIssuer
+import com.hojunnnnn.coupon.application.service.CouponLockManager
+import com.hojunnnnn.coupon.application.service.CouponProvider
 import com.hojunnnnn.coupon.application.service.CouponService
 import com.hojunnnnn.coupon.domain.Coupon
 import com.hojunnnnn.coupon.domain.CouponStatus
@@ -11,7 +14,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.mockito.BDDMockito
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
@@ -21,15 +23,21 @@ import java.time.LocalDateTime
 
 class CouponUseCaseTest {
 
-    private lateinit var userCouponRepository: UserCouponRepository
+    private lateinit var couponIssuer: CouponIssuer
+    private lateinit var couponLockManager: CouponLockManager
+    private lateinit var couponProvider: CouponProvider
     private lateinit var couponRepository: CouponRepository
+    private lateinit var userCouponRepository: UserCouponRepository
     private lateinit var couponUseCase: CouponUseCase
 
     @BeforeEach
     fun init() {
         couponRepository = mock(CouponRepository::class.java)
         userCouponRepository = mock(UserCouponRepository::class.java)
-        couponUseCase = CouponService(couponRepository, userCouponRepository)
+        couponProvider = CouponProvider(couponRepository)
+        couponIssuer = CouponIssuer(couponProvider, userCouponRepository)
+        couponLockManager = CouponLockManager(couponIssuer)
+        couponUseCase = CouponService(couponLockManager, couponProvider)
     }
 
 

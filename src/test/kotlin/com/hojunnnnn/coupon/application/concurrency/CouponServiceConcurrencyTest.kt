@@ -18,7 +18,7 @@ import kotlin.test.Test
 class CouponServiceConcurrencyTest {
 
     @Autowired
-    private lateinit var couponIssuer: CouponIssuer
+    private lateinit var couponService: CouponService
 
     @Autowired
     private lateinit var couponRepository: CouponRepository
@@ -45,7 +45,7 @@ class CouponServiceConcurrencyTest {
                 try {
                     val userId = userIds[index]
 
-                    val result = couponIssuer.issueCoupon(userId, savedCoupon.id)
+                    val result = couponService.issueCoupon(userId, savedCoupon.id)
                     if (result.status == CouponStatus.ISSUED) {
                         successfulIssuance.incrementAndGet()
                     } else {
