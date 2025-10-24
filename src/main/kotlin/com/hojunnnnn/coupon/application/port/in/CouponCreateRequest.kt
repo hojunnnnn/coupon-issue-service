@@ -8,7 +8,6 @@ data class CouponCreateRequest(
     @field:NotBlank
     @field:Pattern(regexp = "^\\S+$")
     val name: String,
-
     @field:Positive
     val quantity: Int,
 )

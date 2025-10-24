@@ -1,6 +1,5 @@
 package com.hojunnnnn.coupon.adapter.persistence
 
-import com.hojunnnnn.coupon.application.port.out.CouponRepository
 import com.hojunnnnn.coupon.application.port.out.UserCouponRepository
 import com.hojunnnnn.coupon.domain.Coupon
 import org.assertj.core.api.Assertions.assertThat
@@ -11,7 +10,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 
 @DataJpaTest
 class UserCouponRepositoryTest {
-
     @Autowired private lateinit var userCouponJpaRepository: UserCouponJpaRepository
 
     private lateinit var userCouponRepository: UserCouponRepository
@@ -25,10 +23,11 @@ class UserCouponRepositoryTest {
     fun `유저는 쿠폰을 발급 받을 수 있다`() {
         // given
         val userId = "user1"
-        val coupon = Coupon(
-            name = "TEST_COUPON",
-            quantity = 10
-        )
+        val coupon =
+            Coupon(
+                name = "TEST_COUPON",
+                quantity = 10,
+            )
 
         // when
         val issuedCoupon = userCouponRepository.issueCouponTo(userId, coupon)
@@ -37,5 +36,4 @@ class UserCouponRepositoryTest {
         assertThat(issuedCoupon).isNotNull()
         assertThat(issuedCoupon.couponId).isEqualTo(coupon.id)
     }
-
 }

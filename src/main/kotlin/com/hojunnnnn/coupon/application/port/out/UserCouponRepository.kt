@@ -4,8 +4,13 @@ import com.hojunnnnn.coupon.domain.Coupon
 import com.hojunnnnn.coupon.domain.UserCoupon
 
 interface UserCouponRepository {
+    fun issueCouponTo(
+        userId: String,
+        coupon: Coupon,
+    ): UserCoupon
 
-    fun issueCouponTo(userId: String, coupon: Coupon): UserCoupon
-
-    fun isAlreadyIssuedCoupon(userId: String, couponId: Long): Boolean
+    fun isAlreadyIssuedCoupon(
+        userId: String,
+        couponId: Long,
+    ): Boolean
 }

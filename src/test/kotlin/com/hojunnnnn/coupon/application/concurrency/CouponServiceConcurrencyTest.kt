@@ -14,10 +14,8 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.test.Test
 
-
 @SpringBootTest
 class CouponServiceConcurrencyTest {
-
     @Autowired
     private lateinit var couponService: CouponService
 
@@ -46,8 +44,8 @@ class CouponServiceConcurrencyTest {
                 try {
                     couponIssuer.issueCoupon(userId, savedCoupon.id)
                     successfulIssuance.incrementAndGet()
-                } catch(e: Exception) {
-                  failedIssuance.incrementAndGet()
+                } catch (e: Exception) {
+                    failedIssuance.incrementAndGet()
                 }
             }
         }
@@ -63,7 +61,7 @@ class CouponServiceConcurrencyTest {
         val coupon = couponRepository.findById(savedCoupon.id)
         assertThat(coupon.quantity).isEqualTo(9)
     }
-    
+
     @Test
     fun `동시에 쿠폰 발급 요청이 들어와도 수량만큼만 발급된다`() {
         // given
@@ -76,7 +74,7 @@ class CouponServiceConcurrencyTest {
         val successfulIssuance = AtomicInteger(0)
         val failedIssuance = AtomicInteger(0)
 
-        val userIds = (1 .. numberOfThread).map { "user-${it}" }
+        val userIds = (1..numberOfThread).map { "user-$it" }
         val savedCoupon = couponRepository.save(Coupon(name = name, quantity = quantity))
 
         // when
@@ -100,16 +98,13 @@ class CouponServiceConcurrencyTest {
         }
         latch.await()
 
-
         // then
         assertThat(successfulIssuance.get()).isEqualTo(100)
         assertThat(failedIssuance.get()).isEqualTo(900)
         println("successfulIssuance : ${successfulIssuance.get()}")
         println("failedIssuance : ${failedIssuance.get()}")
 
-
         val coupon = couponRepository.findById(savedCoupon.id)
         assertThat(coupon.quantity).isEqualTo(0)
     }
-
 }

@@ -13,113 +13,108 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.transaction.annotation.Transactional
 
-
 @Transactional
 @SpringBootTest
-class CouponServiceIntegrationTest @Autowired constructor(
-    private val couponUseCase: CouponUseCase,
-    private val couponRepository: CouponRepository,
-    private val userCouponRepository: UserCouponRepository
-) {
+class CouponServiceIntegrationTest
+    @Autowired
+    constructor(
+        private val couponUseCase: CouponUseCase,
+        private val couponRepository: CouponRepository,
+        private val userCouponRepository: UserCouponRepository,
+    ) {
+        @Nested
+        inner class `쿠폰 생성` {
+            @Test
+            fun `같은 이름의 쿠폰이 존재하면 예외가 발생한다`() {
+                val name = "TEST_COUPON"
+                val quantity = 10
+                val coupon = Coupon(name = name, quantity = quantity)
+                couponRepository.save(coupon)
 
-    @Nested
-    inner class `쿠폰 생성` {
+                assertThrows<Exception> { couponUseCase.createCoupon(name, quantity) }
+            }
 
-        @Test
-        fun `같은 이름의 쿠폰이 존재하면 예외가 발생한다`() {
-            val name = "TEST_COUPON"
-            val quantity = 10
-            val coupon = Coupon(name = name, quantity = quantity)
-            couponRepository.save(coupon)
+            @Test
+            fun `성공`() {
+                val name = "TEST_COUPON"
+                val quantity = 10
 
-            assertThrows<Exception> { couponUseCase.createCoupon(name, quantity) }
+                val result = couponUseCase.createCoupon(name, quantity)
 
+                assertThat(result).isNotNull()
+                assertThat(result.name).isEqualTo(name)
+                assertThat(result.quantity).isEqualTo(quantity)
+            }
         }
 
-        @Test
-        fun `성공`() {
-            val name = "TEST_COUPON"
-            val quantity = 10
+        @Nested
+        inner class `쿠폰 발급` {
+            @Test
+            fun `쿠폰이 존재하지 않으면 예외가 발생한다`() {
+                val userId = "USER1"
+                val couponId = 1L
 
-            val result = couponUseCase.createCoupon(name, quantity)
+                assertThrows<Exception> { couponUseCase.issueCoupon(userId, couponId) }
+            }
 
-            assertThat(result).isNotNull()
-            assertThat(result.name).isEqualTo(name)
-            assertThat(result.quantity).isEqualTo(quantity)
+            @Test
+            fun `남은 수량이 0이하면 예외가 발생한다`() {
+                val userId = "USER1"
+                val name = "SOLD_OUT_COUPON"
+                val quantity = 0
+                val savedCoupon = couponRepository.save(Coupon(name = name, quantity = quantity))
 
-        }
+                assertThrows<Exception> { couponUseCase.issueCoupon(userId, savedCoupon.id) }
+            }
 
-    }
+            @Test
+            fun `만료된 쿠폰이면 예외가 발생한다`() {
+                val userId = "USER1"
+                val name = "TEST_COUPON"
+                val quantity = 10
+                val savedCoupon =
+                    couponRepository.save(
+                        Coupon(
+                            name = name,
+                            quantity = quantity,
+                            expiredDateTime =
+                                java.time.LocalDateTime
+                                    .now()
+                                    .minusDays(1),
+                        ),
+                    )
 
-    @Nested
-    inner class `쿠폰 발급` {
+                assertThrows<Exception> { couponUseCase.issueCoupon(userId, savedCoupon.id) }
+            }
 
-        @Test
-        fun `쿠폰이 존재하지 않으면 예외가 발생한다`() {
-            val userId = "USER1"
-            val couponId = 1L
+            @Test
+            fun `이미 발급된 쿠폰이면 예외가 발생한다`() {
+                val userId = "USER1"
+                val name = "TEST_COUPON"
+                val quantity = 10
+                val savedCoupon = couponRepository.save(Coupon(name = name, quantity = quantity))
+                userCouponRepository.issueCouponTo(userId, savedCoupon)
 
-            assertThrows<Exception> { couponUseCase.issueCoupon(userId, couponId) }
-        }
+                assertThrows<Exception> { couponUseCase.issueCoupon(userId, savedCoupon.id) }
+            }
 
-        @Test
-        fun `남은 수량이 0이하면 예외가 발생한다`() {
-            val userId = "USER1"
-            val name = "SOLD_OUT_COUPON"
-            val quantity = 0
-            val savedCoupon = couponRepository.save(Coupon(name = name, quantity = quantity))
+            @Test
+            fun `성공`() {
+                val userId = "USER1"
+                val name = "TEST_COUPON"
+                val quantity = 10
+                val savedCoupon = couponRepository.save(Coupon(name = name, quantity = quantity))
 
-            assertThrows<Exception> { couponUseCase.issueCoupon(userId, savedCoupon.id) }
-        }
+                val result = couponUseCase.issueCoupon(userId, savedCoupon.id)
 
-        @Test
-        fun `만료된 쿠폰이면 예외가 발생한다`() {
-            val userId = "USER1"
-            val name = "TEST_COUPON"
-            val quantity = 10
-            val savedCoupon = couponRepository.save(
-                Coupon(
-                    name = name,
-                    quantity = quantity,
-                    expiredDateTime = java.time.LocalDateTime.now().minusDays(1)
-                )
-            )
+                assertThat(result).isNotNull()
+                assertThat(result.couponId).isEqualTo(savedCoupon.id)
+                assertThat(result.userId).isEqualTo(userId)
+                assertThat(result.status).isEqualTo(CouponStatus.ISSUED)
 
-            assertThrows<Exception> { couponUseCase.issueCoupon(userId, savedCoupon.id) }
-
-        }
-
-        @Test
-        fun `이미 발급된 쿠폰이면 예외가 발생한다`() {
-            val userId = "USER1"
-            val name = "TEST_COUPON"
-            val quantity = 10
-            val savedCoupon = couponRepository.save(Coupon(name = name, quantity = quantity))
-            userCouponRepository.issueCouponTo(userId, savedCoupon)
-
-            assertThrows<Exception> { couponUseCase.issueCoupon(userId, savedCoupon.id) }
-
-        }
-
-        @Test
-        fun `성공`() {
-            val userId = "USER1"
-            val name = "TEST_COUPON"
-            val quantity = 10
-            val savedCoupon = couponRepository.save(Coupon(name = name, quantity = quantity))
-
-            val result = couponUseCase.issueCoupon(userId, savedCoupon.id)
-
-            assertThat(result).isNotNull()
-            assertThat(result.couponId).isEqualTo(savedCoupon.id)
-            assertThat(result.userId).isEqualTo(userId)
-            assertThat(result.status).isEqualTo(CouponStatus.ISSUED)
-
-            // 쿠폰 수량 감소 확인
-            val coupon = couponRepository.findById(result.couponId)
-            assertThat(coupon.quantity).isEqualTo(quantity - 1)
-
+                // 쿠폰 수량 감소 확인
+                val coupon = couponRepository.findById(result.couponId)
+                assertThat(coupon.quantity).isEqualTo(quantity - 1)
+            }
         }
     }
-
-}

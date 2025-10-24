@@ -10,9 +10,10 @@ class CouponLockManager(
     private val couponIssuer: CouponIssuer,
     private val reentrantLock: ReentrantLock = ReentrantLock(),
 ) {
-
-    fun issueCoupon(userId: String, couponId: Long): UserCoupon {
-
+    fun issueCoupon(
+        userId: String,
+        couponId: Long,
+    ): UserCoupon {
         if (!reentrantLock.tryLock(2, TimeUnit.SECONDS)) {
             throw Exception("쿠폰 발급이 지연되고 있습니다. 잠시 후 다시 시도해주세요.")
         }
@@ -23,5 +24,4 @@ class CouponLockManager(
             reentrantLock.unlock()
         }
     }
-
 }

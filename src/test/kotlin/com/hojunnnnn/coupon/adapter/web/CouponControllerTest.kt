@@ -21,13 +21,11 @@ import java.time.temporal.ChronoUnit
 
 @WebMvcTest(CouponController::class)
 class CouponControllerTest {
-
     @Autowired
     private lateinit var mockMvc: MockMvc
 
     @MockitoBean
     private lateinit var couponUseCase: CouponUseCase
-
 
     @Nested
     inner class `쿠폰 생성` {
@@ -41,20 +39,21 @@ class CouponControllerTest {
             val expiredDateTime = LocalDateTime.now().plusDays(7).truncatedTo(ChronoUnit.MILLIS)
 
             given(couponUseCase.createCoupon(name, quantity))
-                .willReturn(CouponCreateResponse(
-                    id = 1L,
-                    name = name,
-                    quantity = quantity,
-                    expiredDateTime = expiredDateTime,
-                ))
+                .willReturn(
+                    CouponCreateResponse(
+                        id = 1L,
+                        name = name,
+                        quantity = quantity,
+                        expiredDateTime = expiredDateTime,
+                    ),
+                )
 
             // when
-            val resultActions = mockMvc.post(url) {
-                contentType = MediaType.APPLICATION_JSON
-                content = Gson().toJson(CouponCreateRequest(name = name, quantity = quantity))
-            }
-
-
+            val resultActions =
+                mockMvc.post(url) {
+                    contentType = MediaType.APPLICATION_JSON
+                    content = Gson().toJson(CouponCreateRequest(name = name, quantity = quantity))
+                }
 
             resultActions
                 .andExpect { status { isOk() } }
@@ -62,7 +61,6 @@ class CouponControllerTest {
                 .andExpect { jsonPath("$.name") { value(name) } }
                 .andExpect { jsonPath("$.quantity") { value(quantity) } }
                 .andExpect { jsonPath("$.expiredDateTime") { value(expiredDateTime.toString()) } }
-
         }
 
         @ParameterizedTest
@@ -72,10 +70,11 @@ class CouponControllerTest {
             val name = "TEST_COUPON"
 
             // when
-            val resultActions = mockMvc.post(url) {
-                contentType = MediaType.APPLICATION_JSON
-                content = Gson().toJson(CouponCreateRequest(name = name, quantity = quantity))
-            }
+            val resultActions =
+                mockMvc.post(url) {
+                    contentType = MediaType.APPLICATION_JSON
+                    content = Gson().toJson(CouponCreateRequest(name = name, quantity = quantity))
+                }
 
             // then
             resultActions.andExpect { status { isBadRequest() } }
@@ -88,10 +87,11 @@ class CouponControllerTest {
             val quantity = 100
 
             // when
-            val resultActions = mockMvc.post(url) {
-                contentType = MediaType.APPLICATION_JSON
-                content = Gson().toJson(CouponCreateRequest(name = name, quantity = quantity))
-            }
+            val resultActions =
+                mockMvc.post(url) {
+                    contentType = MediaType.APPLICATION_JSON
+                    content = Gson().toJson(CouponCreateRequest(name = name, quantity = quantity))
+                }
 
             // then
             resultActions.andExpect { status { isBadRequest() } }
@@ -104,10 +104,10 @@ class CouponControllerTest {
 
         @Test
         fun `사용자 식별값이 헤더에 존재하지 않으면 예외를 반환한다`() {
-
-            val resultActions = mockMvc.post(url) {
-                contentType = MediaType.APPLICATION_JSON
-            }
+            val resultActions =
+                mockMvc.post(url) {
+                    contentType = MediaType.APPLICATION_JSON
+                }
 
             resultActions.andExpect { status { isBadRequest() } }
         }
@@ -116,16 +116,13 @@ class CouponControllerTest {
         fun `성공`() {
             val userId = "USER1"
 
-            val resultActions = mockMvc.post(url) {
-                header(USER_ID_HEADER, userId)
-                contentType = MediaType.APPLICATION_JSON
-            }
+            val resultActions =
+                mockMvc.post(url) {
+                    header(USER_ID_HEADER, userId)
+                    contentType = MediaType.APPLICATION_JSON
+                }
 
             resultActions.andExpect { status { isOk() } }
         }
     }
-
-
 }
-
-

@@ -4,7 +4,8 @@ import com.hojunnnnn.coupon.domain.UserCoupon
 import org.springframework.data.jpa.repository.JpaRepository
 
 interface UserCouponJpaRepository : JpaRepository<UserCoupon, Long> {
-
-    fun existsByUserIdAndCouponId(userId: String, couponId: Long): Boolean
-
+    fun existsByUserIdAndCouponId(
+        userId: String,
+        couponId: Long,
+    ): Boolean
 }

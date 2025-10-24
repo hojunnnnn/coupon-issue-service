@@ -10,11 +10,14 @@ import org.springframework.transaction.annotation.Transactional
 class CouponProvider(
     private val couponRepository: CouponRepository,
 ) {
-
-
     @Transactional
-    fun createCoupon(name: String, quantity: Int): CouponCreateResponse {
-        if(couponRepository.existsByName(name)) { throw Exception() }
+    fun createCoupon(
+        name: String,
+        quantity: Int,
+    ): CouponCreateResponse {
+        if (couponRepository.existsByName(name)) {
+            throw Exception()
+        }
         val savedCoupon = couponRepository.save(Coupon(name = name, quantity = quantity))
         return CouponCreateResponse(
             id = savedCoupon.id,
@@ -24,7 +27,5 @@ class CouponProvider(
         )
     }
 
-    fun findBy(couponId: Long): Coupon {
-        return couponRepository.findById(couponId)
-    }
+    fun findBy(couponId: Long): Coupon = couponRepository.findById(couponId)
 }

@@ -22,7 +22,6 @@ import org.mockito.kotlin.given
 import java.time.LocalDateTime
 
 class CouponUseCaseTest {
-
     private lateinit var couponIssuer: CouponIssuer
     private lateinit var couponLockManager: CouponLockManager
     private lateinit var couponProvider: CouponProvider
@@ -40,18 +39,15 @@ class CouponUseCaseTest {
         couponUseCase = CouponService(couponLockManager, couponProvider)
     }
 
-
     @Nested
     inner class `쿠폰 생성` {
-
         @Test
         fun `같은 이름이 존재하는 경우 예외가 발생한다`() {
             val name = "TEST_COUPON"
-            BDDMockito.given(couponRepository.existsByName(name))
+            given(couponRepository.existsByName(name))
                 .willReturn(true)
 
             assertThrows<Exception> { couponUseCase.createCoupon(name, 10) }
-
         }
 
         @Test
@@ -76,7 +72,6 @@ class CouponUseCaseTest {
 
     @Nested
     inner class `쿠폰 발행` {
-
         @Test
         fun `쿠폰이 존재하지 않으면 예외가 발생한다`() {
             val userId = "USER1"
@@ -119,7 +114,6 @@ class CouponUseCaseTest {
 
             // then
             verify(userCouponRepository, never()).issueCouponTo(any(), any())
-
         }
 
         @Test
@@ -140,10 +134,12 @@ class CouponUseCaseTest {
             given(couponRepository.findById(any()))
                 .willReturn(Coupon(id = couponId, name = "TEST_COUPON", quantity = 10))
             given(userCouponRepository.issueCouponTo(any(), any()))
-                .willReturn(UserCoupon(
-                    userId = userId,
-                    couponId = couponId,
-                    status = CouponStatus.ISSUED)
+                .willReturn(
+                    UserCoupon(
+                        userId = userId,
+                        couponId = couponId,
+                        status = CouponStatus.ISSUED,
+                    ),
                 )
 
             // when
@@ -155,5 +151,4 @@ class CouponUseCaseTest {
             assertThat(result.couponId).isEqualTo(couponId)
         }
     }
-
 }

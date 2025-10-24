@@ -10,21 +10,21 @@ import org.springframework.stereotype.Component
 class UserCouponPersistenceAdapter(
     private val userCouponJpaRepository: UserCouponJpaRepository,
 ) : UserCouponRepository {
-
     override fun issueCouponTo(
         userId: String,
-        coupon: Coupon
+        coupon: Coupon,
     ): UserCoupon {
-        val userCoupon = UserCoupon(
-            couponId = coupon.id,
-            userId = userId,
-            status = CouponStatus.ISSUED,
-        )
+        val userCoupon =
+            UserCoupon(
+                couponId = coupon.id,
+                userId = userId,
+                status = CouponStatus.ISSUED,
+            )
         return userCouponJpaRepository.save(userCoupon)
     }
 
-    override fun isAlreadyIssuedCoupon(userId: String, couponId: Long): Boolean {
-        return userCouponJpaRepository.existsByUserIdAndCouponId(userId, couponId)
-    }
-
+    override fun isAlreadyIssuedCoupon(
+        userId: String,
+        couponId: Long,
+    ): Boolean = userCouponJpaRepository.existsByUserIdAndCouponId(userId, couponId)
 }

@@ -7,25 +7,24 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 
 @DataJpaTest
-class CouponRepositoryTest @Autowired constructor(
-    val couponJpaRepository: CouponJpaRepository,
-) {
+class CouponRepositoryTest
+    @Autowired
+    constructor(
+        val couponJpaRepository: CouponJpaRepository,
+    ) {
+        @Test
+        fun `쿠폰을 생성할 수 있다`() {
+            // given
+            val coupon =
+                Coupon(
+                    name = "testCoupon",
+                    quantity = 100,
+                )
 
+            // when
+            val savedCoupon = couponJpaRepository.save(coupon)
 
-    @Test
-    fun `쿠폰을 생성할 수 있다`() {
-        // given
-        val coupon = Coupon(
-            name = "testCoupon",
-            quantity = 100,
-        )
-
-        // when
-        val savedCoupon = couponJpaRepository.save(coupon)
-
-        // then
-        assertThat(savedCoupon).isNotNull()
+            // then
+            assertThat(savedCoupon).isNotNull()
+        }
     }
-
-}
-

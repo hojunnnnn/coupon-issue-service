@@ -14,13 +14,13 @@ class CouponService(
     private val couponLockManager: CouponLockManager,
     private val couponProvider: CouponProvider,
 ) : CouponUseCase {
+    override fun createCoupon(
+        name: String,
+        quantity: Int,
+    ): CouponCreateResponse = couponProvider.createCoupon(name, quantity)
 
-
-    override fun createCoupon(name: String, quantity: Int): CouponCreateResponse {
-        return couponProvider.createCoupon(name, quantity)
-    }
-
-    override fun issueCoupon(userId: String, couponId: Long): UserCoupon {
-        return couponLockManager.issueCoupon(userId, couponId)
-    }
+    override fun issueCoupon(
+        userId: String,
+        couponId: Long,
+    ): UserCoupon = couponLockManager.issueCoupon(userId, couponId)
 }

@@ -17,9 +17,9 @@ import org.springframework.web.bind.annotation.RestController
 class CouponController(
     private val couponUseCase: CouponUseCase,
 ) {
-
     @PostMapping("/api/v1/coupons")
-    fun createCoupon(@RequestBody @Valid request: CouponCreateRequest
+    fun createCoupon(
+        @RequestBody @Valid request: CouponCreateRequest,
     ): ResponseEntity<CouponCreateResponse> {
         val response = couponUseCase.createCoupon(request.name, request.quantity)
         return ResponseEntity.ok(response)
@@ -33,5 +33,4 @@ class CouponController(
         val response = couponUseCase.issueCoupon(userId, id)
         return ResponseEntity.ok(response)
     }
-
 }

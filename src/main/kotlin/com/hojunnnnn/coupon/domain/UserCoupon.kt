@@ -15,13 +15,12 @@ import java.time.LocalDateTime
     uniqueConstraints = [
         UniqueConstraint(
             name = "uk_user_coupon_user_id_coupon_id",
-            columnNames = ["user_id", "coupon_id"]
-        )
-    ]
+            columnNames = ["user_id", "coupon_id"],
+        ),
+    ],
 )
 @Entity
 class UserCoupon(
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
@@ -34,6 +33,4 @@ class UserCoupon(
     val status: CouponStatus,
     @Column(nullable = false)
     val issuedDateTime: LocalDateTime = LocalDateTime.now(),
-) {
-
-}
+)

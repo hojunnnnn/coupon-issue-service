@@ -7,13 +7,9 @@ import com.hojunnnnn.coupon.domain.Coupon
  * 헥사고날 아키텍처의 아웃바운드 포트
  */
 interface CouponRepository {
-
     fun save(coupon: Coupon): Coupon
 
     fun existsByName(name: String): Boolean
 
     fun findById(id: Long): Coupon
-
-    fun countByName(name: String): Long
-
 }

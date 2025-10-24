@@ -12,9 +12,11 @@ class CouponIssuer(
     private val couponProvider: CouponProvider,
     private val userCouponRepository: UserCouponRepository,
 ) {
-
     @Transactional
-    fun issueCoupon(userId: String, couponId: Long): UserCoupon {
+    fun issueCoupon(
+        userId: String,
+        couponId: Long,
+    ): UserCoupon {
         val coupon = couponProvider.findBy(couponId)
         validateCoupon(coupon, userId)
 
@@ -23,7 +25,10 @@ class CouponIssuer(
         return userCouponRepository.issueCouponTo(userId, coupon)
     }
 
-    private fun validateCoupon(coupon: Coupon, userId: String) {
+    private fun validateCoupon(
+        coupon: Coupon,
+        userId: String,
+    ) {
         if (coupon.isSoldOut()) {
             throw Exception()
         }
