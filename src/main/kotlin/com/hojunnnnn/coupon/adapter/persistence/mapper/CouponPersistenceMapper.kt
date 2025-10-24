@@ -5,6 +5,7 @@ import com.hojunnnnn.coupon.domain.CouponId
 import com.hojunnnnn.coupon.domain.CouponName
 import com.hojunnnnn.coupon.domain.CouponQuantity
 import com.hojunnnnn.coupon.domain.Coupon
+import com.hojunnnnn.coupon.domain.CouponExpirationDays
 import org.springframework.stereotype.Component
 
 @Component
@@ -16,7 +17,7 @@ class CouponPersistenceMapper {
             name = coupon.name.value,
             quantity = coupon.quantity.value,
             createdDateTime = coupon.createdDateTime,
-            expiredDateTime = coupon.expiredDateTime,
+            expiredDateTime = coupon.expiredDateTime.value,
         )
     }
 
@@ -26,7 +27,7 @@ class CouponPersistenceMapper {
             name = CouponName(couponEntity.name),
             quantity = CouponQuantity(couponEntity.quantity),
             createdDateTime = couponEntity.createdDateTime,
-            expiredDateTime = couponEntity.expiredDateTime,
+            expiredDateTime = CouponExpirationDays(couponEntity.expiredDateTime),
         )
     }
 

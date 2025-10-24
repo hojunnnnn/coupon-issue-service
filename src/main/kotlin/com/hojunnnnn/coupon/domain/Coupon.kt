@@ -11,27 +11,20 @@ data class Coupon(
 
     val createdDateTime: LocalDateTime = LocalDateTime.now(),
 
-    val expiredDateTime: LocalDateTime = LocalDateTime.now().plusDays(7)
+    val expiredDateTime: CouponExpirationDays = CouponExpirationDays.generate()
 ) {
-
-
-    init {
-        require(quantity.value >= 0) { "쿠폰 수량은 0 이상이어야 합니다." }
-        require(LocalDateTime.now().isBefore(expiredDateTime)) { "쿠폰 만료일은 현재 시간 이후여야 합니다." }
-    }
-
 
     companion object {
         fun create(
             name: String,
             quantity: Int,
-            expiredDateTime: LocalDateTime = LocalDateTime.now().plusDays(7),
+            expiredDateTime: LocalDateTime = CouponExpirationDays.generate().value,
         ): Coupon {
             return Coupon(
                 id = CouponId.generate(),
                 name = CouponName(name),
                 quantity = CouponQuantity(quantity),
-                expiredDateTime = expiredDateTime
+                expiredDateTime = CouponExpirationDays(expiredDateTime)
             )
         }
     }

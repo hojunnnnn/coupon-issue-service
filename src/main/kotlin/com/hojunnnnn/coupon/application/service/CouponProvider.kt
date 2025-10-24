@@ -23,7 +23,7 @@ class CouponProvider(
             id = savedCoupon.id.value,
             name = savedCoupon.name.value,
             quantity = savedCoupon.quantity.value,
-            expiredDateTime = savedCoupon.expiredDateTime,
+            expiredDateTime = savedCoupon.expiredDateTime.value,
         )
     }
 
