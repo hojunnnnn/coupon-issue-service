@@ -6,9 +6,6 @@ import com.hojunnnnn.coupon.application.service.CouponIssuer
 import com.hojunnnnn.coupon.application.service.CouponLockManager
 import com.hojunnnnn.coupon.application.service.CouponProvider
 import com.hojunnnnn.coupon.application.service.CouponService
-import com.hojunnnnn.coupon.adapter.persistence.entity.CouponEntity
-import com.hojunnnnn.coupon.domain.CouponStatus
-import com.hojunnnnn.coupon.adapter.persistence.entity.UserCouponEntity
 import com.hojunnnnn.coupon.domain.Coupon
 import com.hojunnnnn.coupon.domain.UserCoupon
 import org.assertj.core.api.Assertions.assertThat

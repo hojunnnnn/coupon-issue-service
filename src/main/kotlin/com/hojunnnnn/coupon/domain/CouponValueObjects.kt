@@ -35,14 +35,15 @@ value class CouponQuantity(
 
 @JvmInline
 value class CouponExpirationDays(
-    val value: LocalDateTime
+    val value: LocalDateTime,
 ) {
     companion object {
         private const val DEFAULT_EXPIRATION_DAYS = 7L
+
         fun generate(): CouponExpirationDays = CouponExpirationDays(LocalDateTime.now().plusDays(DEFAULT_EXPIRATION_DAYS))
     }
+
     init {
         require(value.isAfter(LocalDateTime.now())) { "Coupon expiration date must be in the future" }
     }
 }
-

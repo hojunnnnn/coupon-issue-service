@@ -1,8 +1,7 @@
 package com.hojunnnnn.coupon.adapter.persistence
 
-import com.hojunnnnn.coupon.application.port.out.UserCouponRepository
-import com.hojunnnnn.coupon.adapter.persistence.entity.CouponEntity
 import com.hojunnnnn.coupon.adapter.persistence.mapper.UserCouponPersistenceMapper
+import com.hojunnnnn.coupon.application.port.out.UserCouponRepository
 import com.hojunnnnn.coupon.domain.Coupon
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -26,7 +25,6 @@ class UserCouponRepositoryTest {
         // given
         val userId = "user1"
         val coupon = Coupon.create("TEST_COUPON", 10)
-
 
         // when
         val issuedCoupon = userCouponRepository.issueCouponTo(userId, coupon)

@@ -15,7 +15,6 @@ class CouponPersistenceAdapter(
     private val couponJpaRepository: CouponJpaRepository,
     private val couponPersistenceMapper: CouponPersistenceMapper,
 ) : CouponRepository {
-
     override fun save(coupon: Coupon): Coupon {
         val entity = couponPersistenceMapper.toEntity(coupon)
         val savedEntity = couponJpaRepository.save(entity)

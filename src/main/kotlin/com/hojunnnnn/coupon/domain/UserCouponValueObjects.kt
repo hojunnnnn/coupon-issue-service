@@ -1,7 +1,9 @@
 package com.hojunnnnn.coupon.domain
 
 @JvmInline
-value class UserCouponId(val value: Long) {
+value class UserCouponId(
+    val value: Long,
+) {
     companion object {
         fun generate(): UserCouponId = UserCouponId(0L) // Auto-increment will assign the actual ID
     }
@@ -11,15 +13,14 @@ value class UserCouponId(val value: Long) {
     }
 }
 
-
 @JvmInline
-value class UserId(val value: String) {
+value class UserId(
+    val value: String,
+) {
     init {
         require(value.isNotEmpty()) { "User Id must be non-empty" }
     }
 }
-
-
 
 enum class CouponStatus {
     ISSUED,
