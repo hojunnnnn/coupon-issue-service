@@ -1,6 +1,7 @@
 package com.hojunnnnn.coupon.application.port.`in`
 
-import com.hojunnnnn.coupon.domain.UserCoupon
+import com.hojunnnnn.coupon.adapter.web.CouponCreateResponse
+import com.hojunnnnn.coupon.adapter.web.CouponIssueResponse
 
 /**
  * 쿠폰 유스케이스 인터페이스
@@ -15,5 +16,5 @@ interface CouponUseCase {
     fun issueCoupon(
         userId: String,
         couponId: Long,
-    ): UserCoupon
+    ): CouponIssueResponse
 }

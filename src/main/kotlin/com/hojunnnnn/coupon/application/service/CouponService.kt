@@ -1,8 +1,8 @@
 package com.hojunnnnn.coupon.application.service
 
-import com.hojunnnnn.coupon.application.port.`in`.CouponCreateResponse
+import com.hojunnnnn.coupon.adapter.web.CouponIssueResponse
+import com.hojunnnnn.coupon.adapter.web.CouponCreateResponse
 import com.hojunnnnn.coupon.application.port.`in`.CouponUseCase
-import com.hojunnnnn.coupon.domain.UserCoupon
 import org.springframework.stereotype.Service
 
 /**
@@ -22,5 +22,5 @@ class CouponService(
     override fun issueCoupon(
         userId: String,
         couponId: Long,
-    ): UserCoupon = couponLockManager.issueCoupon(userId, couponId)
+    ): CouponIssueResponse = couponLockManager.issueCoupon(userId, couponId)
 }

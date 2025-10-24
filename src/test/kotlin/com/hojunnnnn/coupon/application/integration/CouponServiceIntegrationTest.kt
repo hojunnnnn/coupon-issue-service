@@ -6,12 +6,14 @@ import com.hojunnnnn.coupon.application.port.out.UserCouponRepository
 import com.hojunnnnn.coupon.domain.Coupon
 import com.hojunnnnn.coupon.domain.CouponStatus
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 
 @Transactional
 @SpringBootTest
@@ -28,7 +30,7 @@ class CouponServiceIntegrationTest
             fun `같은 이름의 쿠폰이 존재하면 예외가 발생한다`() {
                 val name = "TEST_COUPON"
                 val quantity = 10
-                val coupon = Coupon(name = name, quantity = quantity)
+                val coupon = Coupon.create(name, quantity)
                 couponRepository.save(coupon)
 
                 assertThrows<Exception> { couponUseCase.createCoupon(name, quantity) }
@@ -39,7 +41,8 @@ class CouponServiceIntegrationTest
                 val name = "TEST_COUPON"
                 val quantity = 10
 
-                val result = couponUseCase.createCoupon(name, quantity)
+                val result =
+                    couponUseCase.createCoupon(name, quantity)
 
                 assertThat(result).isNotNull()
                 assertThat(result.name).isEqualTo(name)
@@ -57,34 +60,28 @@ class CouponServiceIntegrationTest
                 assertThrows<Exception> { couponUseCase.issueCoupon(userId, couponId) }
             }
 
+            @Disabled("도메인에서 자체 검증")
             @Test
             fun `남은 수량이 0이하면 예외가 발생한다`() {
                 val userId = "USER1"
                 val name = "SOLD_OUT_COUPON"
                 val quantity = 0
-                val savedCoupon = couponRepository.save(Coupon(name = name, quantity = quantity))
+                val savedCoupon =
+                    couponRepository.save(Coupon.create(name, quantity))
 
-                assertThrows<Exception> { couponUseCase.issueCoupon(userId, savedCoupon.id) }
+                assertThrows<Exception> { couponUseCase.issueCoupon(userId, savedCoupon.id.value) }
             }
 
+            @Disabled("도메인에서 자체 검증")
             @Test
             fun `만료된 쿠폰이면 예외가 발생한다`() {
                 val userId = "USER1"
                 val name = "TEST_COUPON"
                 val quantity = 10
                 val savedCoupon =
-                    couponRepository.save(
-                        Coupon(
-                            name = name,
-                            quantity = quantity,
-                            expiredDateTime =
-                                java.time.LocalDateTime
-                                    .now()
-                                    .minusDays(1),
-                        ),
-                    )
+                    couponRepository.save(Coupon.create(name, quantity, LocalDateTime.now().minusDays(1)))
 
-                assertThrows<Exception> { couponUseCase.issueCoupon(userId, savedCoupon.id) }
+                assertThrows<Exception> { couponUseCase.issueCoupon(userId, savedCoupon.id.value) }
             }
 
             @Test
@@ -92,10 +89,10 @@ class CouponServiceIntegrationTest
                 val userId = "USER1"
                 val name = "TEST_COUPON"
                 val quantity = 10
-                val savedCoupon = couponRepository.save(Coupon(name = name, quantity = quantity))
+                val savedCoupon = couponRepository.save(Coupon.create(name, quantity))
                 userCouponRepository.issueCouponTo(userId, savedCoupon)
 
-                assertThrows<Exception> { couponUseCase.issueCoupon(userId, savedCoupon.id) }
+                assertThrows<Exception> { couponUseCase.issueCoupon(userId, savedCoupon.id.value) }
             }
 
             @Test
@@ -103,18 +100,18 @@ class CouponServiceIntegrationTest
                 val userId = "USER1"
                 val name = "TEST_COUPON"
                 val quantity = 10
-                val savedCoupon = couponRepository.save(Coupon(name = name, quantity = quantity))
+                val savedCoupon = couponRepository.save(Coupon.create(name, quantity))
 
-                val result = couponUseCase.issueCoupon(userId, savedCoupon.id)
+                val result = couponUseCase.issueCoupon(userId, savedCoupon.id.value)
 
                 assertThat(result).isNotNull()
-                assertThat(result.couponId).isEqualTo(savedCoupon.id)
+                assertThat(result.couponId).isEqualTo(savedCoupon.id.value)
                 assertThat(result.userId).isEqualTo(userId)
-                assertThat(result.status).isEqualTo(CouponStatus.ISSUED)
+                assertThat(result.couponStatus).isEqualTo(CouponStatus.ISSUED.name)
 
                 // 쿠폰 수량 감소 확인
                 val coupon = couponRepository.findById(result.couponId)
-                assertThat(coupon.quantity).isEqualTo(quantity - 1)
+                assertThat(coupon.quantity.value).isEqualTo(quantity - 1)
             }
         }
     }

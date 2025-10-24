@@ -1,17 +1,10 @@
 package com.hojunnnnn.coupon.adapter.web
 
 import com.hojunnnnn.coupon.adapter.web.HeaderKeys.USER_ID_HEADER
-import com.hojunnnnn.coupon.application.port.`in`.CouponCreateRequest
-import com.hojunnnnn.coupon.application.port.`in`.CouponCreateResponse
 import com.hojunnnnn.coupon.application.port.`in`.CouponUseCase
-import com.hojunnnnn.coupon.domain.UserCoupon
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestHeader
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 class CouponController(
@@ -29,7 +22,7 @@ class CouponController(
     fun issueCoupon(
         @RequestHeader(USER_ID_HEADER) userId: String,
         @PathVariable id: Long,
-    ): ResponseEntity<UserCoupon> {
+    ): ResponseEntity<CouponIssueResponse> {
         val response = couponUseCase.issueCoupon(userId, id)
         return ResponseEntity.ok(response)
     }

@@ -1,6 +1,6 @@
 package com.hojunnnnn.coupon.application.service
 
-import com.hojunnnnn.coupon.domain.UserCoupon
+import com.hojunnnnn.coupon.adapter.web.CouponIssueResponse
 import org.springframework.stereotype.Component
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReentrantLock
@@ -13,8 +13,8 @@ class CouponLockManager(
     fun issueCoupon(
         userId: String,
         couponId: Long,
-    ): UserCoupon {
-        if (!reentrantLock.tryLock(2, TimeUnit.SECONDS)) {
+    ): CouponIssueResponse {
+        if (!reentrantLock.tryLock(3, TimeUnit.SECONDS)) {
             throw Exception("쿠폰 발급이 지연되고 있습니다. 잠시 후 다시 시도해주세요.")
         }
 

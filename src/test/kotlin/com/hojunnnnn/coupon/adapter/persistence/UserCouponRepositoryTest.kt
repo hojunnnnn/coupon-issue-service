@@ -1,6 +1,8 @@
 package com.hojunnnnn.coupon.adapter.persistence
 
 import com.hojunnnnn.coupon.application.port.out.UserCouponRepository
+import com.hojunnnnn.coupon.adapter.persistence.entity.CouponEntity
+import com.hojunnnnn.coupon.adapter.persistence.mapper.UserCouponPersistenceMapper
 import com.hojunnnnn.coupon.domain.Coupon
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -16,18 +18,15 @@ class UserCouponRepositoryTest {
 
     @BeforeEach
     fun init() {
-        userCouponRepository = UserCouponPersistenceAdapter(userCouponJpaRepository)
+        userCouponRepository = UserCouponPersistenceAdapter(userCouponJpaRepository, UserCouponPersistenceMapper())
     }
 
     @Test
     fun `유저는 쿠폰을 발급 받을 수 있다`() {
         // given
         val userId = "user1"
-        val coupon =
-            Coupon(
-                name = "TEST_COUPON",
-                quantity = 10,
-            )
+        val coupon = Coupon.create("TEST_COUPON", 10)
+
 
         // when
         val issuedCoupon = userCouponRepository.issueCouponTo(userId, coupon)

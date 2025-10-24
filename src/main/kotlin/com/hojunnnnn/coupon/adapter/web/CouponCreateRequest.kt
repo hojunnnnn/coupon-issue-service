@@ -1,4 +1,4 @@
-package com.hojunnnnn.coupon.application.port.`in`
+package com.hojunnnnn.coupon.adapter.web
 
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Pattern

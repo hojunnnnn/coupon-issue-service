@@ -37,12 +37,12 @@ class CouponServiceConcurrencyTest {
         val successfulIssuance = AtomicInteger(0)
         val failedIssuance = AtomicInteger(0)
 
-        val savedCoupon = couponRepository.save(Coupon(name = name, quantity = quantity))
+        val savedCoupon = couponRepository.save(Coupon.create(name, quantity))
 
         repeat(numberOfThread) {
             executorService.submit {
                 try {
-                    couponIssuer.issueCoupon(userId, savedCoupon.id)
+                    couponIssuer.issueCoupon(userId, savedCoupon.id.value)
                     successfulIssuance.incrementAndGet()
                 } catch (e: Exception) {
                     failedIssuance.incrementAndGet()
@@ -58,8 +58,8 @@ class CouponServiceConcurrencyTest {
         println("successfulIssuance : ${successfulIssuance.get()}")
         println("failedIssuance : ${failedIssuance.get()}")
 
-        val coupon = couponRepository.findById(savedCoupon.id)
-        assertThat(coupon.quantity).isEqualTo(9)
+        val coupon = couponRepository.findById(savedCoupon.id.value)
+        assertThat(coupon.quantity.value).isEqualTo(9)
     }
 
     @Test
@@ -75,7 +75,7 @@ class CouponServiceConcurrencyTest {
         val failedIssuance = AtomicInteger(0)
 
         val userIds = (1..numberOfThread).map { "user-$it" }
-        val savedCoupon = couponRepository.save(Coupon(name = name, quantity = quantity))
+        val savedCoupon = couponRepository.save(Coupon.create(name, quantity))
 
         // when
         repeat(numberOfThread) { index ->
@@ -83,8 +83,8 @@ class CouponServiceConcurrencyTest {
                 try {
                     val userId = userIds[index]
 
-                    val result = couponService.issueCoupon(userId, savedCoupon.id)
-                    if (result.status == CouponStatus.ISSUED) {
+                    val result = couponService.issueCoupon(userId, savedCoupon.id.value)
+                    if (CouponStatus.ISSUED.name == result.couponStatus) {
                         successfulIssuance.incrementAndGet()
                     } else {
                         failedIssuance.incrementAndGet()
@@ -104,7 +104,7 @@ class CouponServiceConcurrencyTest {
         println("successfulIssuance : ${successfulIssuance.get()}")
         println("failedIssuance : ${failedIssuance.get()}")
 
-        val coupon = couponRepository.findById(savedCoupon.id)
-        assertThat(coupon.quantity).isEqualTo(0)
+        val coupon = couponRepository.findById(savedCoupon.id.value)
+        assertThat(coupon.quantity.value).isEqualTo(0)
     }
 }

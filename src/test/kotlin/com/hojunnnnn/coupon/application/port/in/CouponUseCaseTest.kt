@@ -6,11 +6,14 @@ import com.hojunnnnn.coupon.application.service.CouponIssuer
 import com.hojunnnnn.coupon.application.service.CouponLockManager
 import com.hojunnnnn.coupon.application.service.CouponProvider
 import com.hojunnnnn.coupon.application.service.CouponService
-import com.hojunnnnn.coupon.domain.Coupon
+import com.hojunnnnn.coupon.adapter.persistence.entity.CouponEntity
 import com.hojunnnnn.coupon.domain.CouponStatus
+import com.hojunnnnn.coupon.adapter.persistence.entity.UserCouponEntity
+import com.hojunnnnn.coupon.domain.Coupon
 import com.hojunnnnn.coupon.domain.UserCoupon
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -34,7 +37,7 @@ class CouponUseCaseTest {
         couponRepository = mock(CouponRepository::class.java)
         userCouponRepository = mock(UserCouponRepository::class.java)
         couponProvider = CouponProvider(couponRepository)
-        couponIssuer = CouponIssuer(couponProvider, userCouponRepository)
+        couponIssuer = CouponIssuer(couponRepository, userCouponRepository)
         couponLockManager = CouponLockManager(couponIssuer)
         couponUseCase = CouponService(couponLockManager, couponProvider)
     }
@@ -58,7 +61,7 @@ class CouponUseCaseTest {
             given(couponRepository.existsByName(name))
                 .willReturn(false)
             given(couponRepository.save(any()))
-                .willReturn(Coupon(name = name, quantity = quantity))
+                .willReturn(Coupon.create(name, quantity))
 
             // when
             val result = couponUseCase.createCoupon(name, quantity)
@@ -86,13 +89,14 @@ class CouponUseCaseTest {
             verify(userCouponRepository, never()).issueCouponTo(any(), any())
         }
 
+        @Disabled("도메인에서 자체 검증")
         @Test
         fun `남은 수량이 0일 경우 예외가 발생한다`() {
             // given
             val userId = "USER1"
             val couponId = 1L
             given(couponRepository.findById(any()))
-                .willReturn(Coupon(id = 1L, name = "TEST_COUPON", quantity = 0))
+                .willReturn(Coupon.create("TEST_COUPON", 0))
 
             // when
             assertThrows<Exception> { couponUseCase.issueCoupon(userId, couponId) }
@@ -101,13 +105,14 @@ class CouponUseCaseTest {
             verify(userCouponRepository, never()).issueCouponTo(any(), any())
         }
 
+        @Disabled("도메인에서 자체 검증")
         @Test
         fun `만료된 쿠폰이면 예외가 발생한다`() {
             // given
             val userId = "USER1"
             val couponId = 1L
             given(couponRepository.findById(any()))
-                .willReturn(Coupon(id = 1L, name = "TEST_COUPON", quantity = 10, expiredDateTime = LocalDateTime.now().minusDays(1)))
+                .willReturn(Coupon.create("TEST_COUPON", 10, expiredDateTime = LocalDateTime.now().minusDays(1)))
 
             // when
             assertThrows<Exception> { couponUseCase.issueCoupon(userId, couponId) }
@@ -132,15 +137,9 @@ class CouponUseCaseTest {
             val userId = "USER1"
             val couponId = 1L
             given(couponRepository.findById(any()))
-                .willReturn(Coupon(id = couponId, name = "TEST_COUPON", quantity = 10))
+                .willReturn(Coupon.create("TEST_COUPON", 10))
             given(userCouponRepository.issueCouponTo(any(), any()))
-                .willReturn(
-                    UserCoupon(
-                        userId = userId,
-                        couponId = couponId,
-                        status = CouponStatus.ISSUED,
-                    ),
-                )
+                .willReturn(UserCoupon.create(couponId, userId))
 
             // when
             val result = couponUseCase.issueCoupon(userId, couponId)

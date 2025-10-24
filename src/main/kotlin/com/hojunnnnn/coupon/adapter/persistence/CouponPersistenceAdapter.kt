@@ -1,5 +1,6 @@
 package com.hojunnnnn.coupon.adapter.persistence
 
+import com.hojunnnnn.coupon.adapter.persistence.mapper.CouponPersistenceMapper
 import com.hojunnnnn.coupon.application.port.out.CouponRepository
 import com.hojunnnnn.coupon.domain.Coupon
 import org.springframework.data.repository.findByIdOrNull
@@ -12,10 +13,19 @@ import org.springframework.stereotype.Component
 @Component
 class CouponPersistenceAdapter(
     private val couponJpaRepository: CouponJpaRepository,
+    private val couponPersistenceMapper: CouponPersistenceMapper,
 ) : CouponRepository {
-    override fun save(coupon: Coupon): Coupon = couponJpaRepository.save(coupon)
+
+    override fun save(coupon: Coupon): Coupon {
+        val entity = couponPersistenceMapper.toEntity(coupon)
+        val savedEntity = couponJpaRepository.save(entity)
+        return couponPersistenceMapper.toDomain(savedEntity)
+    }
 
     override fun existsByName(name: String): Boolean = couponJpaRepository.existsByName(name)
 
-    override fun findById(id: Long): Coupon = couponJpaRepository.findByIdOrNull(id) ?: throw Exception()
+    override fun findById(id: Long): Coupon {
+        val entity = couponJpaRepository.findByIdOrNull(id) ?: throw Exception()
+        return couponPersistenceMapper.toDomain(entity)
+    }
 }
