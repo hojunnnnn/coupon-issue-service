@@ -7,17 +7,27 @@ import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.Table
+import jakarta.persistence.UniqueConstraint
 import java.time.LocalDateTime
 
+@Table(
+    uniqueConstraints = [
+        UniqueConstraint(
+            name = "uk_user_coupon_user_id_coupon_id",
+            columnNames = ["user_id", "coupon_id"]
+        )
+    ]
+)
 @Entity
 class UserCoupon(
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
-    @Column(nullable = false)
+    @Column(name = "coupon_id", nullable = false)
     val couponId: Long,
-    @Column(nullable = false)
+    @Column(name = "user_id", nullable = false)
     val userId: String,
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
