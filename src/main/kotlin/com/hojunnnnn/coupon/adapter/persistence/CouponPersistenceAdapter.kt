@@ -5,6 +5,8 @@ import com.hojunnnnn.coupon.application.port.out.CouponRepository
 import com.hojunnnnn.coupon.domain.Coupon
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
+import java.time.LocalDate
+import java.time.LocalDateTime
 
 /**
  * JPA 쿠폰 데이터 접근 구현체
@@ -25,6 +27,14 @@ class CouponPersistenceAdapter(
 
     override fun findById(id: Long): Coupon {
         val entity = couponJpaRepository.findByIdOrNull(id) ?: throw Exception()
+        return couponPersistenceMapper.toDomain(entity)
+    }
+
+    override fun findEventCoupon(
+        from: LocalDateTime,
+        to: LocalDateTime,
+    ): Coupon? {
+        val entity = couponJpaRepository.findEventCoupon(from, to).firstOrNull() ?: return null
         return couponPersistenceMapper.toDomain(entity)
     }
 }

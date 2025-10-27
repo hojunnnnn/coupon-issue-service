@@ -147,4 +147,44 @@ class CouponUseCaseTest {
             assertThat(result.couponId).isEqualTo(couponId)
         }
     }
+
+    @Nested
+    inner class `이벤트 쿠폰 발행` {
+
+        @Test
+        fun `쿠폰이 존재하지 않으면 예외가 발생한다`() {
+            val userId = "USER1"
+            given(couponRepository.findEventCoupon(any(), any()))
+                .willReturn(null)
+
+            assertThrows<Exception> { couponUseCase.issueEventCoupon(userId) }
+        }
+
+        @Test
+        fun `이미 발급된 쿠폰이면 예외가 발생한다`() {
+            val userId = "USER1"
+            given(couponRepository.findEventCoupon(any(), any()))
+                .willReturn(Coupon.create("EVENT_COUPON", 10))
+            given(userCouponRepository.isAlreadyIssuedCoupon(any(), any()))
+                .willReturn(true)
+
+            assertThrows<Exception> { couponUseCase.issueEventCoupon(userId) }
+        }
+
+        @Test
+        fun `성공`() {
+            val userId = "USER1"
+            val couponId = 1L
+            given(couponRepository.findEventCoupon(any(), any()))
+                .willReturn(Coupon.create("EVENT_COUPON", 10))
+            given(userCouponRepository.issueCouponTo(any(), any()))
+                .willReturn(UserCoupon.create(couponId, userId))
+
+            val result = couponUseCase.issueEventCoupon(userId)
+
+            assertThat(result).isNotNull()
+            assertThat(result.userId).isEqualTo(userId)
+            assertThat(result.couponId).isEqualTo(couponId)
+        }
+    }
 }

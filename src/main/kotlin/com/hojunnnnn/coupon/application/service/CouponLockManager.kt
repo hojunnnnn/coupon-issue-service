@@ -24,4 +24,7 @@ class CouponLockManager(
             reentrantLock.unlock()
         }
     }
+
+    fun issueEventCoupon(userId: String
+    ): CouponIssueResponse = couponIssuer.issueEventCoupon(userId)
 }

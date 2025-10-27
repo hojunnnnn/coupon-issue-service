@@ -1,6 +1,7 @@
 package com.hojunnnnn.coupon.application.port.out
 
 import com.hojunnnnn.coupon.domain.Coupon
+import java.time.LocalDateTime
 
 /**
  * 쿠폰 데이터 접근을 위한 인터페이스
@@ -12,4 +13,9 @@ interface CouponRepository {
     fun existsByName(name: String): Boolean
 
     fun findById(id: Long): Coupon
+
+    fun findEventCoupon(
+        from: LocalDateTime,
+        to: LocalDateTime
+    ): Coupon?
 }

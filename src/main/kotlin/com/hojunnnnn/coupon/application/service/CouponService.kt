@@ -23,4 +23,7 @@ class CouponService(
         userId: String,
         couponId: Long,
     ): CouponIssueResponse = couponLockManager.issueCoupon(userId, couponId)
+
+    override fun issueEventCoupon(userId: String
+    ): CouponIssueResponse = couponLockManager.issueEventCoupon(userId)
 }

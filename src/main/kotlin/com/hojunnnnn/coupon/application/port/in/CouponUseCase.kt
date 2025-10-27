@@ -17,4 +17,8 @@ interface CouponUseCase {
         userId: String,
         couponId: Long,
     ): CouponIssueResponse
+
+    fun issueEventCoupon(
+        userId: String,
+    ): CouponIssueResponse
 }
