@@ -123,4 +123,32 @@ class CouponControllerTest {
             resultActions.andExpect { status { isOk() } }
         }
     }
+
+    @Nested
+    inner class `이벤트 쿠폰 발행` {
+        private val url = "/api/v1/coupons/event/issue"
+
+        @Test
+        fun `사용자 식별값이 헤더에 존재하지 않으면 예외를 반환한다`() {
+            val resultActions =
+                mockMvc.post(url) {
+                    contentType = MediaType.APPLICATION_JSON
+                }
+
+            resultActions.andExpect { status { isBadRequest() } }
+        }
+
+        @Test
+        fun `성공`() {
+            val userId = "USER1"
+
+            val resultActions =
+                mockMvc.post(url) {
+                    header(USER_ID_HEADER, userId)
+                    contentType = MediaType.APPLICATION_JSON
+                }
+
+            resultActions.andExpect { status { isOk() } }
+        }
+    }
 }

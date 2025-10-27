@@ -26,4 +26,13 @@ class CouponController(
         val response = couponUseCase.issueCoupon(userId, id)
         return ResponseEntity.ok(response)
     }
+
+    @PostMapping("/api/v1/coupons/event/issue")
+    fun issueEventCoupon(
+        @RequestHeader(USER_ID_HEADER) userId: String,
+    ): ResponseEntity<CouponIssueResponse> {
+        val response = couponUseCase.issueEventCoupon(userId)
+        return ResponseEntity.ok(response)
+    }
+
 }
