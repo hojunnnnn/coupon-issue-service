@@ -35,7 +35,7 @@ class CouponUseCaseTest {
         userCouponRepository = mock(UserCouponRepository::class.java)
         couponProvider = CouponProvider(couponRepository)
         couponIssuer = CouponIssuer(couponRepository, userCouponRepository)
-        couponLockManager = CouponLockManager(couponIssuer)
+        couponLockManager = CouponLockManager(couponIssuer, couponProvider)
         couponUseCase = CouponService(couponLockManager, couponProvider)
     }
 

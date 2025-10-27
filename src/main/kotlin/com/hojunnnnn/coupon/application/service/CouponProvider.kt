@@ -5,6 +5,7 @@ import com.hojunnnnn.coupon.application.port.out.CouponRepository
 import com.hojunnnnn.coupon.domain.Coupon
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDate
 
 @Component
 class CouponProvider(
@@ -27,5 +28,11 @@ class CouponProvider(
         )
     }
 
-    fun findBy(couponId: Long): Coupon = couponRepository.findById(couponId)
+    fun getTodayEventCoupon(): Coupon {
+        val today = LocalDate.now()
+        val from = today.atStartOfDay()
+        val to = today.plusDays(1).atStartOfDay()
+        return couponRepository.findEventCoupon(from, to)
+            ?: throw Exception("today event coupon is not exist")
+    }
 }
