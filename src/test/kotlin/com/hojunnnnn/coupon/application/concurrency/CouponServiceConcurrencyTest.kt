@@ -63,7 +63,7 @@ class CouponServiceConcurrencyTest {
     }
 
     @Test
-    fun `동시에 쿠폰 발급 요청이 들어와도 수량만큼만 발급된다`() {
+    fun `동시에 요청이 들어와도 수량만큼만 발급된다`() {
         // given
         val name = "WINTER_COUPON"
         val quantity = 100
@@ -96,7 +96,7 @@ class CouponServiceConcurrencyTest {
                 }
             }
         }
-        latch.await()
+        latch.await(5, TimeUnit.SECONDS)
 
         // then
         assertThat(successfulIssuance.get()).isEqualTo(100)
@@ -110,9 +110,9 @@ class CouponServiceConcurrencyTest {
 
 
     @Test
-    fun `동시에 이벤트 쿠폰 발급 요청이 들어와도 선착순 수량만큼만 발급된다`() {
+    fun `동시에 요청이 들어와도 선착순 수량만큼만 발급된다`() {
         // given
-        val name = "EVENT_COUPON"
+        val name = "TODAY_COUPON"
         val quantity = 100
 
         val numberOfThread = 1000
@@ -143,7 +143,7 @@ class CouponServiceConcurrencyTest {
                 }
             }
         }
-        latch.await()
+        latch.await(5, TimeUnit.SECONDS)
 
         // then
         assertThat(successfulIssuance.get()).isEqualTo(100)
@@ -156,7 +156,7 @@ class CouponServiceConcurrencyTest {
     }
 
     @Test
-    fun `서로 다른 쿠폰 발급 메서드가 동시에 호출되어도 락이 독립적으로 동작한다`() {
+    fun `서로 다른 쿠폰 발행 요청이 동시에 호출되어도 락이 독립적으로 동작한다`() {
         // given
         val couponA = couponRepository.save(Coupon.create("TEST_COUPON", 50))
         val couponB = couponRepository.save(Coupon.create("EVENT_COUPON", 50))
