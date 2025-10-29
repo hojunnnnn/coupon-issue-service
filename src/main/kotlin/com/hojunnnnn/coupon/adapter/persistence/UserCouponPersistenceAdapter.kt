@@ -24,4 +24,6 @@ class UserCouponPersistenceAdapter(
         userId: String,
         couponId: Long,
     ): Boolean = userCouponJpaRepository.existsByUserIdAndCouponId(userId, couponId)
+
+    override fun deleteAll() = userCouponJpaRepository.deleteAll()
 }

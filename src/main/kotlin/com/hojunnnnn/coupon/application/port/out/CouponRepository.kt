@@ -18,4 +18,6 @@ interface CouponRepository {
         from: LocalDateTime,
         to: LocalDateTime
     ): Coupon?
+
+    fun deleteAll()
 }

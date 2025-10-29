@@ -37,4 +37,6 @@ class CouponPersistenceAdapter(
         val entity = couponJpaRepository.findEventCoupon(from, to).firstOrNull() ?: return null
         return couponPersistenceMapper.toDomain(entity)
     }
+
+    override fun deleteAll() = couponJpaRepository.deleteAll()
 }

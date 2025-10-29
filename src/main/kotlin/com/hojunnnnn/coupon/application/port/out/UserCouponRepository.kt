@@ -13,4 +13,6 @@ interface UserCouponRepository {
         userId: String,
         couponId: Long,
     ): Boolean
+
+    fun deleteAll()
 }

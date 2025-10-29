@@ -6,16 +6,14 @@ import com.hojunnnnn.coupon.application.port.out.UserCouponRepository
 import com.hojunnnnn.coupon.domain.Coupon
 import com.hojunnnnn.coupon.domain.CouponStatus
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 
-@Transactional
 @SpringBootTest
 class CouponServiceIntegrationTest
     @Autowired
@@ -24,7 +22,14 @@ class CouponServiceIntegrationTest
         private val couponRepository: CouponRepository,
         private val userCouponRepository: UserCouponRepository,
     ) {
-        @Nested
+
+    @AfterEach
+    fun clean() {
+        userCouponRepository.deleteAll()
+        couponRepository.deleteAll()
+    }
+
+    @Nested
         inner class `쿠폰 생성` {
             @Test
             fun `같은 이름의 쿠폰이 존재하면 예외가 발생한다`() {
@@ -60,9 +65,8 @@ class CouponServiceIntegrationTest
                 assertThrows<Exception> { couponUseCase.issueCoupon(userId, couponId) }
             }
 
-            @Disabled("도메인에서 자체 검증")
             @Test
-            fun `남은 수량이 0이하면 예외가 발생한다`() {
+            fun `남은 수량이 없으면 예외가 발생한다`() {
                 val userId = "USER1"
                 val name = "SOLD_OUT_COUPON"
                 val quantity = 0
@@ -72,7 +76,6 @@ class CouponServiceIntegrationTest
                 assertThrows<Exception> { couponUseCase.issueCoupon(userId, savedCoupon.id.value) }
             }
 
-            @Disabled("도메인에서 자체 검증")
             @Test
             fun `만료된 쿠폰이면 예외가 발생한다`() {
                 val userId = "USER1"
