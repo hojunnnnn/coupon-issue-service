@@ -29,8 +29,16 @@ value class CouponQuantity(
     val value: Int,
 ) {
     init {
-        require(value >= 0) { "Coupon quantity must be positive" }
+        require(value >= 0) { "Coupon quantity cannot be negative" }
     }
+
+    fun hasRemaining(): Boolean = value > 0
+
+    fun decrease(): CouponQuantity {
+        require(hasRemaining()) { "No remaining coupons to issue" }
+        return CouponQuantity(value - 1)
+    }
+
 }
 
 @JvmInline
@@ -43,7 +51,6 @@ value class CouponExpirationDays(
         fun generate(): CouponExpirationDays = CouponExpirationDays(LocalDateTime.now().plusDays(DEFAULT_EXPIRATION_DAYS))
     }
 
-    init {
-        require(value.isAfter(LocalDateTime.now())) { "Coupon expiration date must be in the future" }
-    }
+    fun isExpired(now: LocalDateTime = LocalDateTime.now()): Boolean =
+        value.isBefore(now)
 }

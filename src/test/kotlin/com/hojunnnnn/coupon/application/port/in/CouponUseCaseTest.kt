@@ -86,9 +86,8 @@ class CouponUseCaseTest {
             verify(userCouponRepository, never()).issueCouponTo(any(), any())
         }
 
-        @Disabled("도메인에서 자체 검증")
         @Test
-        fun `남은 수량이 0일 경우 예외가 발생한다`() {
+        fun `남은 수량이 없으면 예외가 발생한다`() {
             // given
             val userId = "USER1"
             val couponId = 1L
@@ -102,7 +101,6 @@ class CouponUseCaseTest {
             verify(userCouponRepository, never()).issueCouponTo(any(), any())
         }
 
-        @Disabled("도메인에서 자체 검증")
         @Test
         fun `만료된 쿠폰이면 예외가 발생한다`() {
             // given
@@ -175,8 +173,12 @@ class CouponUseCaseTest {
         fun `성공`() {
             val userId = "USER1"
             val couponId = 1L
+            val couponName = "EVENT_COUPON"
+            val quantity = 10
             given(couponRepository.findEventCoupon(any(), any()))
-                .willReturn(Coupon.create("EVENT_COUPON", 10))
+                .willReturn(Coupon.create(couponName, quantity))
+            given(couponRepository.findById(any()))
+                .willReturn(Coupon.create(couponName, quantity))
             given(userCouponRepository.issueCouponTo(any(), any()))
                 .willReturn(UserCoupon.create(couponId, userId))
 

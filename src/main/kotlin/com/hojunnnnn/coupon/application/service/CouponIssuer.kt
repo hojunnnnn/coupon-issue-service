@@ -21,7 +21,7 @@ class CouponIssuer(
             throw Exception()
         }
 
-        coupon.decreaseQuantity()
+        coupon.issue()
         couponRepository.save(coupon)
 
         val issuedCoupon = userCouponRepository.issueCouponTo(userId, coupon)

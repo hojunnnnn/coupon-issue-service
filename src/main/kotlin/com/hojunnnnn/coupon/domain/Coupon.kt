@@ -23,7 +23,13 @@ data class Coupon(
             )
     }
 
-    fun decreaseQuantity() {
-        quantity = CouponQuantity(quantity.value - 1)
+    fun issue() {
+        if (expiredDateTime.isExpired()) {
+            throw Exception()
+        }
+        if(!quantity.hasRemaining()) {
+            throw Exception()
+        }
+        quantity = quantity.decrease()
     }
 }
