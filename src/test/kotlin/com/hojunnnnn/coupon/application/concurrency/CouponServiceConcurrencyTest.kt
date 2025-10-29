@@ -59,7 +59,7 @@ class CouponServiceConcurrencyTest {
         println("failedIssuance : ${failedIssuance.get()}")
 
         val coupon = couponRepository.findById(savedCoupon.id.value)
-        assertThat(coupon.quantity.value).isEqualTo(9)
+        assertThat(coupon!!.quantity.value).isEqualTo(9)
     }
 
     @Test
@@ -105,7 +105,7 @@ class CouponServiceConcurrencyTest {
         println("failedIssuance : ${failedIssuance.get()}")
 
         val coupon = couponRepository.findById(savedCoupon.id.value)
-        assertThat(coupon.quantity.value).isEqualTo(0)
+        assertThat(coupon!!.quantity.value).isEqualTo(0)
     }
 
 
@@ -152,7 +152,7 @@ class CouponServiceConcurrencyTest {
         println("failedIssuance : ${failedIssuance.get()}")
 
         val coupon = couponRepository.findById(savedCoupon.id.value)
-        assertThat(coupon.quantity.value).isEqualTo(0)
+        assertThat(coupon!!.quantity.value).isEqualTo(0)
     }
 
     @Test
@@ -205,8 +205,8 @@ class CouponServiceConcurrencyTest {
 
         val updatedA = couponRepository.findById(couponA.id.value)
         val updatedB = couponRepository.findById(couponB.id.value)
-        assertThat(updatedA.quantity.value).isEqualTo(49)
-        assertThat(updatedB.quantity.value).isEqualTo(49)
+        assertThat(updatedA!!.quantity.value).isEqualTo(49)
+        assertThat(updatedB!!.quantity.value).isEqualTo(49)
     }
 
 }

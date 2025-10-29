@@ -12,7 +12,7 @@ interface CouponRepository {
 
     fun existsByName(name: String): Boolean
 
-    fun findById(id: Long): Coupon
+    fun findById(id: Long): Coupon?
 
     fun findEventCoupon(
         from: LocalDateTime,

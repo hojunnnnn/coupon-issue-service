@@ -3,6 +3,8 @@ package com.hojunnnnn.coupon.application.service
 import com.hojunnnnn.coupon.adapter.web.CouponIssueResponse
 import com.hojunnnnn.coupon.application.port.out.CouponRepository
 import com.hojunnnnn.coupon.application.port.out.UserCouponRepository
+import com.hojunnnnn.coupon.errors.CouponAlreadyIssuedException
+import com.hojunnnnn.coupon.errors.CouponNotFoundException
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 
@@ -16,9 +18,9 @@ class CouponIssuer(
         userId: String,
         couponId: Long,
     ): CouponIssueResponse {
-        val coupon = couponRepository.findById(couponId)
+        val coupon = couponRepository.findById(couponId) ?: throw CouponNotFoundException()
         if (userCouponRepository.isAlreadyIssuedCoupon(userId, coupon.id.value)) {
-            throw Exception()
+            throw CouponAlreadyIssuedException()
         }
 
         coupon.issue()

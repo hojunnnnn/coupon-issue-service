@@ -5,6 +5,11 @@ import com.hojunnnnn.coupon.application.port.out.CouponRepository
 import com.hojunnnnn.coupon.application.port.out.UserCouponRepository
 import com.hojunnnnn.coupon.domain.Coupon
 import com.hojunnnnn.coupon.domain.CouponStatus
+import com.hojunnnnn.coupon.errors.CouponAlreadyIssuedException
+import com.hojunnnnn.coupon.errors.CouponDuplicationException
+import com.hojunnnnn.coupon.errors.CouponExpiredException
+import com.hojunnnnn.coupon.errors.CouponNotFoundException
+import com.hojunnnnn.coupon.errors.CouponOutOfStockException
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Nested
@@ -38,7 +43,7 @@ class CouponServiceIntegrationTest
                 val coupon = Coupon.create(name, quantity)
                 couponRepository.save(coupon)
 
-                assertThrows<Exception> { couponUseCase.createCoupon(name, quantity) }
+                assertThrows<CouponDuplicationException> { couponUseCase.createCoupon(name, quantity) }
             }
 
             @Test
@@ -62,7 +67,7 @@ class CouponServiceIntegrationTest
                 val userId = "USER1"
                 val couponId = 1L
 
-                assertThrows<Exception> { couponUseCase.issueCoupon(userId, couponId) }
+                assertThrows<CouponNotFoundException> { couponUseCase.issueCoupon(userId, couponId) }
             }
 
             @Test
@@ -73,7 +78,7 @@ class CouponServiceIntegrationTest
                 val savedCoupon =
                     couponRepository.save(Coupon.create(name, quantity))
 
-                assertThrows<Exception> { couponUseCase.issueCoupon(userId, savedCoupon.id.value) }
+                assertThrows<CouponOutOfStockException> { couponUseCase.issueCoupon(userId, savedCoupon.id.value) }
             }
 
             @Test
@@ -84,7 +89,7 @@ class CouponServiceIntegrationTest
                 val savedCoupon =
                     couponRepository.save(Coupon.create(name, quantity, LocalDateTime.now().minusDays(1)))
 
-                assertThrows<Exception> { couponUseCase.issueCoupon(userId, savedCoupon.id.value) }
+                assertThrows<CouponExpiredException> { couponUseCase.issueCoupon(userId, savedCoupon.id.value) }
             }
 
             @Test
@@ -95,7 +100,7 @@ class CouponServiceIntegrationTest
                 val savedCoupon = couponRepository.save(Coupon.create(name, quantity))
                 userCouponRepository.issueCouponTo(userId, savedCoupon)
 
-                assertThrows<Exception> { couponUseCase.issueCoupon(userId, savedCoupon.id.value) }
+                assertThrows<CouponAlreadyIssuedException> { couponUseCase.issueCoupon(userId, savedCoupon.id.value) }
             }
 
             @Test
@@ -114,7 +119,7 @@ class CouponServiceIntegrationTest
 
                 // 쿠폰 수량 감소 확인
                 val coupon = couponRepository.findById(result.couponId)
-                assertThat(coupon.quantity.value).isEqualTo(quantity - 1)
+                assertThat(coupon!!.quantity.value).isEqualTo(quantity - 1)
             }
         }
     }

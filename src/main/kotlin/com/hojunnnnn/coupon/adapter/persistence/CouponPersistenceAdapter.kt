@@ -3,6 +3,7 @@ package com.hojunnnnn.coupon.adapter.persistence
 import com.hojunnnnn.coupon.adapter.persistence.mapper.CouponPersistenceMapper
 import com.hojunnnnn.coupon.application.port.out.CouponRepository
 import com.hojunnnnn.coupon.domain.Coupon
+import com.hojunnnnn.coupon.errors.CouponNotFoundException
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
 import java.time.LocalDate
@@ -25,9 +26,9 @@ class CouponPersistenceAdapter(
 
     override fun existsByName(name: String): Boolean = couponJpaRepository.existsByName(name)
 
-    override fun findById(id: Long): Coupon {
-        val entity = couponJpaRepository.findByIdOrNull(id) ?: throw Exception()
-        return couponPersistenceMapper.toDomain(entity)
+    override fun findById(id: Long): Coupon? {
+        return couponJpaRepository.findByIdOrNull(id)
+            ?.let { couponPersistenceMapper.toDomain(it) }
     }
 
     override fun findEventCoupon(

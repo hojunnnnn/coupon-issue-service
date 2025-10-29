@@ -8,15 +8,13 @@ import com.hojunnnnn.coupon.application.service.CouponProvider
 import com.hojunnnnn.coupon.application.service.CouponService
 import com.hojunnnnn.coupon.domain.Coupon
 import com.hojunnnnn.coupon.domain.UserCoupon
+import com.hojunnnnn.coupon.errors.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.never
-import org.mockito.Mockito.verify
+import org.mockito.Mockito.*
 import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import java.time.LocalDateTime
@@ -47,7 +45,7 @@ class CouponUseCaseTest {
             given(couponRepository.existsByName(name))
                 .willReturn(true)
 
-            assertThrows<Exception> { couponUseCase.createCoupon(name, 10) }
+            assertThrows<CouponDuplicationException> { couponUseCase.createCoupon(name, 10) }
         }
 
         @Test
@@ -80,7 +78,7 @@ class CouponUseCaseTest {
                 .willReturn(null)
 
             // when
-            assertThrows<Exception> { couponUseCase.issueCoupon(userId, couponId) }
+            assertThrows<CouponNotFoundException> { couponUseCase.issueCoupon(userId, couponId) }
 
             // then
             verify(userCouponRepository, never()).issueCouponTo(any(), any())
@@ -95,7 +93,7 @@ class CouponUseCaseTest {
                 .willReturn(Coupon.create("TEST_COUPON", 0))
 
             // when
-            assertThrows<Exception> { couponUseCase.issueCoupon(userId, couponId) }
+            assertThrows<CouponOutOfStockException> { couponUseCase.issueCoupon(userId, couponId) }
 
             // then
             verify(userCouponRepository, never()).issueCouponTo(any(), any())
@@ -110,7 +108,7 @@ class CouponUseCaseTest {
                 .willReturn(Coupon.create("TEST_COUPON", 10, expiredDateTime = LocalDateTime.now().minusDays(1)))
 
             // when
-            assertThrows<Exception> { couponUseCase.issueCoupon(userId, couponId) }
+            assertThrows<CouponExpiredException> { couponUseCase.issueCoupon(userId, couponId) }
 
             // then
             verify(userCouponRepository, never()).issueCouponTo(any(), any())
@@ -120,10 +118,12 @@ class CouponUseCaseTest {
         fun `이미 발급된 쿠폰이면 예외가 발생한다`() {
             val userId = "USER1"
             val couponId = 1L
+            given(couponRepository.findById(any()))
+                .willReturn(Coupon.create("TEST_COUPON", 10))
             given(userCouponRepository.isAlreadyIssuedCoupon(any(), any()))
                 .willReturn(true)
 
-            assertThrows<Exception> { couponUseCase.issueCoupon(userId, couponId) }
+            assertThrows<CouponAlreadyIssuedException> { couponUseCase.issueCoupon(userId, couponId) }
         }
 
         @Test
@@ -133,6 +133,8 @@ class CouponUseCaseTest {
             val couponId = 1L
             given(couponRepository.findById(any()))
                 .willReturn(Coupon.create("TEST_COUPON", 10))
+            given(userCouponRepository.isAlreadyIssuedCoupon(any(), any()))
+                .willReturn(false)
             given(userCouponRepository.issueCouponTo(any(), any()))
                 .willReturn(UserCoupon.create(couponId, userId))
 
@@ -155,30 +157,34 @@ class CouponUseCaseTest {
             given(couponRepository.findEventCoupon(any(), any()))
                 .willReturn(null)
 
-            assertThrows<Exception> { couponUseCase.issueEventCoupon(userId) }
+            assertThrows<CouponNotFoundException> { couponUseCase.issueEventCoupon(userId) }
         }
 
         @Test
         fun `이미 발급된 쿠폰이면 예외가 발생한다`() {
             val userId = "USER1"
+            val coupon = Coupon.create("EVENT_COUPON", 10)
             given(couponRepository.findEventCoupon(any(), any()))
-                .willReturn(Coupon.create("EVENT_COUPON", 10))
+                .willReturn(coupon)
+            given(couponRepository.findById(any()))
+                .willReturn(coupon)
             given(userCouponRepository.isAlreadyIssuedCoupon(any(), any()))
                 .willReturn(true)
 
-            assertThrows<Exception> { couponUseCase.issueEventCoupon(userId) }
+            assertThrows<CouponAlreadyIssuedException> { couponUseCase.issueEventCoupon(userId) }
         }
 
         @Test
         fun `성공`() {
             val userId = "USER1"
             val couponId = 1L
-            val couponName = "EVENT_COUPON"
-            val quantity = 10
+            val coupon = Coupon.create("EVENT_COUPON", 10)
             given(couponRepository.findEventCoupon(any(), any()))
-                .willReturn(Coupon.create(couponName, quantity))
+                .willReturn(coupon)
             given(couponRepository.findById(any()))
-                .willReturn(Coupon.create(couponName, quantity))
+                .willReturn(coupon)
+            given(userCouponRepository.isAlreadyIssuedCoupon(any(), any()))
+                .willReturn(false)
             given(userCouponRepository.issueCouponTo(any(), any()))
                 .willReturn(UserCoupon.create(couponId, userId))
 

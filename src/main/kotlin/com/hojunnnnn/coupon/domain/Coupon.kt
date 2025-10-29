@@ -1,5 +1,7 @@
 package com.hojunnnnn.coupon.domain
 
+import com.hojunnnnn.coupon.errors.CouponExpiredException
+import com.hojunnnnn.coupon.errors.CouponOutOfStockException
 import java.time.LocalDateTime
 
 data class Coupon(
@@ -24,12 +26,8 @@ data class Coupon(
     }
 
     fun issue() {
-        if (expiredDateTime.isExpired()) {
-            throw Exception()
-        }
-        if(!quantity.hasRemaining()) {
-            throw Exception()
-        }
+        if(expiredDateTime.isExpired()) throw CouponExpiredException()
+        if(!quantity.hasRemaining()) throw CouponOutOfStockException()
         quantity = quantity.decrease()
     }
 }
