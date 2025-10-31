@@ -3,6 +3,7 @@ package com.hojunnnnn.coupon.adapter.web.integration
 import com.google.gson.Gson
 import com.hojunnnnn.coupon.adapter.web.CouponCreateRequest
 import com.hojunnnnn.coupon.adapter.web.HeaderKeys.USER_ID_HEADER
+import com.hojunnnnn.coupon.application.port.`in`.CouponCreateCommand
 import com.hojunnnnn.coupon.application.port.`in`.CouponUseCase
 import com.hojunnnnn.coupon.domain.CouponStatus
 import org.junit.jupiter.api.Nested
@@ -84,7 +85,7 @@ class CouponControllerIntegrationTest
 
             @Test
             fun `성공`() {
-                val coupon = couponUseCase.createCoupon("TEST_COUPON", 10)
+                val coupon = couponUseCase.createCoupon(CouponCreateCommand("TEST_COUPON", 10))
                 val userId = "user-1234"
                 val resultActions =
                     mockMvc.post("/api/v1/coupons/${coupon.id}/issue") {

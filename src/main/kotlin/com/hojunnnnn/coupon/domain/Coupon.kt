@@ -5,7 +5,7 @@ import com.hojunnnnn.coupon.errors.CouponOutOfStockException
 import java.time.LocalDateTime
 
 data class Coupon(
-    val id: CouponId,
+    val id: CouponId = CouponId.generate(),
     val name: CouponName,
     var quantity: CouponQuantity,
     val createdDateTime: LocalDateTime = LocalDateTime.now(),

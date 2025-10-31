@@ -3,6 +3,8 @@ package com.hojunnnnn.coupon.application.service
 import com.hojunnnnn.coupon.adapter.web.CouponCreateResponse
 import com.hojunnnnn.coupon.application.port.out.CouponRepository
 import com.hojunnnnn.coupon.domain.Coupon
+import com.hojunnnnn.coupon.domain.CouponName
+import com.hojunnnnn.coupon.domain.CouponQuantity
 import com.hojunnnnn.coupon.errors.CouponDuplicationException
 import com.hojunnnnn.coupon.errors.CouponNotFoundException
 import org.springframework.stereotype.Component
@@ -15,13 +17,13 @@ class CouponProvider(
 ) {
     @Transactional
     fun createCoupon(
-        name: String,
-        quantity: Int,
+        name: CouponName,
+        quantity: CouponQuantity,
     ): CouponCreateResponse {
-        if (couponRepository.existsByName(name)) {
+        if (couponRepository.existsByName(name.value)) {
             throw CouponDuplicationException()
         }
-        val savedCoupon = couponRepository.save(Coupon.create(name, quantity))
+        val savedCoupon = couponRepository.save(Coupon(name = name, quantity = quantity))
         return CouponCreateResponse(
             id = savedCoupon.id.value,
             name = savedCoupon.name.value,

@@ -1,10 +1,14 @@
 package com.hojunnnnn.coupon.application.concurrency
 
+import com.hojunnnnn.coupon.application.port.`in`.CouponIssueCommand
+import com.hojunnnnn.coupon.application.port.`in`.EventCouponIssueCommand
 import com.hojunnnnn.coupon.application.port.out.CouponRepository
 import com.hojunnnnn.coupon.application.service.CouponIssuer
 import com.hojunnnnn.coupon.application.service.CouponService
 import com.hojunnnnn.coupon.domain.Coupon
+import com.hojunnnnn.coupon.domain.CouponId
 import com.hojunnnnn.coupon.domain.CouponStatus
+import com.hojunnnnn.coupon.domain.UserId
 import org.assertj.core.api.Assertions.assertThat
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -42,7 +46,7 @@ class CouponServiceConcurrencyTest {
         repeat(numberOfThread) {
             executorService.submit {
                 try {
-                    couponIssuer.issueCoupon(userId, savedCoupon.id.value)
+                    couponIssuer.issueCoupon(UserId(userId), CouponId(savedCoupon.id.value))
                     successfulIssuance.incrementAndGet()
                 } catch (e: Exception) {
                     failedIssuance.incrementAndGet()
@@ -82,8 +86,9 @@ class CouponServiceConcurrencyTest {
             executorService.submit {
                 try {
                     val userId = userIds[index]
+                    val command = CouponIssueCommand(userId, savedCoupon.id.value)
 
-                    val result = couponService.issueCoupon(userId, savedCoupon.id.value)
+                    val result = couponService.issueCoupon(command)
                     if (CouponStatus.ISSUED.name == result.couponStatus) {
                         successfulIssuance.incrementAndGet()
                     } else {
@@ -129,8 +134,9 @@ class CouponServiceConcurrencyTest {
             executorService.submit {
                 try {
                     val userId = userIds[index]
+                    val command = EventCouponIssueCommand(userId)
 
-                    val result = couponService.issueEventCoupon(userId)
+                    val result = couponService.issueEventCoupon(command)
                     if (CouponStatus.ISSUED.name == result.couponStatus) {
                         successfulIssuance.incrementAndGet()
                     } else {
@@ -170,11 +176,14 @@ class CouponServiceConcurrencyTest {
         val userA = "USER_A"
         val userB = "USER_B"
 
+        val commandA = CouponIssueCommand(userA, couponA.id.value)
+        val commandB = EventCouponIssueCommand(userB)
+
         // when
         executorService.submit {
             try {
                 // 쿠폰 발급
-                couponService.issueCoupon(userA, couponA.id.value)
+                couponService.issueCoupon(commandA)
                 successfulIssuance.incrementAndGet()
             } catch (e: Exception) {
                 failedIssuance.incrementAndGet()
@@ -186,7 +195,7 @@ class CouponServiceConcurrencyTest {
         executorService.submit {
             try {
                 // 이벤트 쿠폰 발급
-                couponService.issueEventCoupon(userB)
+                couponService.issueEventCoupon(commandB)
                 successfulIssuance.incrementAndGet()
             } catch (e: Exception) {
                 failedIssuance.incrementAndGet()

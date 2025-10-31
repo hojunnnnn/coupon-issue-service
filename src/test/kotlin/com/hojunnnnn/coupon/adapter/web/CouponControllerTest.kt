@@ -2,6 +2,7 @@ package com.hojunnnnn.coupon.adapter.web
 
 import com.google.gson.Gson
 import com.hojunnnnn.coupon.adapter.web.HeaderKeys.USER_ID_HEADER
+import com.hojunnnnn.coupon.application.port.`in`.CouponCreateCommand
 import com.hojunnnnn.coupon.application.port.`in`.CouponUseCase
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -35,8 +36,9 @@ class CouponControllerTest {
             val name = "TEST_COUPON"
             val quantity = 100
             val expiredDateTime = LocalDateTime.now().plusDays(7).truncatedTo(ChronoUnit.MILLIS)
+            val command = CouponCreateCommand(name, quantity)
 
-            given(couponUseCase.createCoupon(name, quantity))
+            given(couponUseCase.createCoupon(command))
                 .willReturn(
                     CouponCreateResponse(
                         id = 1L,

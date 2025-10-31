@@ -18,7 +18,7 @@ value class UserId(
     val value: String,
 ) {
     init {
-        require(value.isNotEmpty()) { "User Id must be non-empty" }
+        require(value.isNotBlank()) { "User Id must be blank" }
     }
 }
 

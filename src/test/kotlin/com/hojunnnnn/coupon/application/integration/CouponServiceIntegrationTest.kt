@@ -1,5 +1,7 @@
 package com.hojunnnnn.coupon.application.integration
 
+import com.hojunnnnn.coupon.application.port.`in`.CouponCreateCommand
+import com.hojunnnnn.coupon.application.port.`in`.CouponIssueCommand
 import com.hojunnnnn.coupon.application.port.`in`.CouponUseCase
 import com.hojunnnnn.coupon.application.port.out.CouponRepository
 import com.hojunnnnn.coupon.application.port.out.UserCouponRepository
@@ -40,19 +42,21 @@ class CouponServiceIntegrationTest
             fun `같은 이름의 쿠폰이 존재하면 예외가 발생한다`() {
                 val name = "TEST_COUPON"
                 val quantity = 10
+                val command = CouponCreateCommand(name, quantity)
                 val coupon = Coupon.create(name, quantity)
                 couponRepository.save(coupon)
 
-                assertThrows<CouponDuplicationException> { couponUseCase.createCoupon(name, quantity) }
+                assertThrows<CouponDuplicationException> { couponUseCase.createCoupon(command) }
             }
 
             @Test
             fun `성공`() {
                 val name = "TEST_COUPON"
                 val quantity = 10
+                val command = CouponCreateCommand(name, quantity)
 
                 val result =
-                    couponUseCase.createCoupon(name, quantity)
+                    couponUseCase.createCoupon(command)
 
                 assertThat(result).isNotNull()
                 assertThat(result.name).isEqualTo(name)
@@ -65,9 +69,10 @@ class CouponServiceIntegrationTest
             @Test
             fun `쿠폰이 존재하지 않으면 예외가 발생한다`() {
                 val userId = "USER1"
-                val couponId = 1L
+                val couponId = 999L
+                val command = CouponIssueCommand(userId, couponId)
 
-                assertThrows<CouponNotFoundException> { couponUseCase.issueCoupon(userId, couponId) }
+                assertThrows<CouponNotFoundException> { couponUseCase.issueCoupon(command) }
             }
 
             @Test
@@ -77,8 +82,9 @@ class CouponServiceIntegrationTest
                 val quantity = 0
                 val savedCoupon =
                     couponRepository.save(Coupon.create(name, quantity))
+                val command = CouponIssueCommand(userId, savedCoupon.id.value)
 
-                assertThrows<CouponOutOfStockException> { couponUseCase.issueCoupon(userId, savedCoupon.id.value) }
+                assertThrows<CouponOutOfStockException> { couponUseCase.issueCoupon(command) }
             }
 
             @Test
@@ -88,8 +94,9 @@ class CouponServiceIntegrationTest
                 val quantity = 10
                 val savedCoupon =
                     couponRepository.save(Coupon.create(name, quantity, LocalDateTime.now().minusDays(1)))
+                val command = CouponIssueCommand(userId, savedCoupon.id.value)
 
-                assertThrows<CouponExpiredException> { couponUseCase.issueCoupon(userId, savedCoupon.id.value) }
+                assertThrows<CouponExpiredException> { couponUseCase.issueCoupon(command) }
             }
 
             @Test
@@ -99,8 +106,9 @@ class CouponServiceIntegrationTest
                 val quantity = 10
                 val savedCoupon = couponRepository.save(Coupon.create(name, quantity))
                 userCouponRepository.issueCouponTo(userId, savedCoupon)
+                val command = CouponIssueCommand(userId, savedCoupon.id.value)
 
-                assertThrows<CouponAlreadyIssuedException> { couponUseCase.issueCoupon(userId, savedCoupon.id.value) }
+                assertThrows<CouponAlreadyIssuedException> { couponUseCase.issueCoupon(command) }
             }
 
             @Test
@@ -109,8 +117,9 @@ class CouponServiceIntegrationTest
                 val name = "TEST_COUPON"
                 val quantity = 10
                 val savedCoupon = couponRepository.save(Coupon.create(name, quantity))
+                val command = CouponIssueCommand(userId, savedCoupon.id.value)
 
-                val result = couponUseCase.issueCoupon(userId, savedCoupon.id.value)
+                val result = couponUseCase.issueCoupon(command)
 
                 assertThat(result).isNotNull()
                 assertThat(result.couponId).isEqualTo(savedCoupon.id.value)

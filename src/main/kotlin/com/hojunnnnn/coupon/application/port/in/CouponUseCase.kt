@@ -8,17 +8,12 @@ import com.hojunnnnn.coupon.adapter.web.CouponIssueResponse
  * 헥사고날 아키텍처의 인바운드 포트
  */
 interface CouponUseCase {
-    fun createCoupon(
-        name: String,
-        quantity: Int,
+    fun createCoupon(couponCreateCommand: CouponCreateCommand
     ): CouponCreateResponse
 
-    fun issueCoupon(
-        userId: String,
-        couponId: Long,
+    fun issueCoupon(couponIssueCommand: CouponIssueCommand
     ): CouponIssueResponse
 
-    fun issueEventCoupon(
-        userId: String,
+    fun issueEventCoupon(eventCouponIssueCommand: EventCouponIssueCommand
     ): CouponIssueResponse
 }
