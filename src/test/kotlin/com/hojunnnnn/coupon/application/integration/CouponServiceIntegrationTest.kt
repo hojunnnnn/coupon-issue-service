@@ -42,7 +42,7 @@ class CouponServiceIntegrationTest
             fun `같은 이름의 쿠폰이 존재하면 예외가 발생한다`() {
                 val name = "TEST_COUPON"
                 val quantity = 10
-                val command = CouponCreateCommand(name, quantity)
+                val command = CouponCreateCommand.of(name, quantity)
                 val coupon = Coupon.create(name, quantity)
                 couponRepository.save(coupon)
 
@@ -53,7 +53,7 @@ class CouponServiceIntegrationTest
             fun `성공`() {
                 val name = "TEST_COUPON"
                 val quantity = 10
-                val command = CouponCreateCommand(name, quantity)
+                val command = CouponCreateCommand.of(name, quantity)
 
                 val result =
                     couponUseCase.createCoupon(command)
@@ -70,7 +70,7 @@ class CouponServiceIntegrationTest
             fun `쿠폰이 존재하지 않으면 예외가 발생한다`() {
                 val userId = "USER1"
                 val couponId = 999L
-                val command = CouponIssueCommand(userId, couponId)
+                val command = CouponIssueCommand.of(userId, couponId)
 
                 assertThrows<CouponNotFoundException> { couponUseCase.issueCoupon(command) }
             }
@@ -82,7 +82,7 @@ class CouponServiceIntegrationTest
                 val quantity = 0
                 val savedCoupon =
                     couponRepository.save(Coupon.create(name, quantity))
-                val command = CouponIssueCommand(userId, savedCoupon.id.value)
+                val command = CouponIssueCommand.of(userId, savedCoupon.id.value)
 
                 assertThrows<CouponOutOfStockException> { couponUseCase.issueCoupon(command) }
             }
@@ -94,7 +94,7 @@ class CouponServiceIntegrationTest
                 val quantity = 10
                 val savedCoupon =
                     couponRepository.save(Coupon.create(name, quantity, LocalDateTime.now().minusDays(1)))
-                val command = CouponIssueCommand(userId, savedCoupon.id.value)
+                val command = CouponIssueCommand.of(userId, savedCoupon.id.value)
 
                 assertThrows<CouponExpiredException> { couponUseCase.issueCoupon(command) }
             }
@@ -106,7 +106,7 @@ class CouponServiceIntegrationTest
                 val quantity = 10
                 val savedCoupon = couponRepository.save(Coupon.create(name, quantity))
                 userCouponRepository.issueCouponTo(userId, savedCoupon)
-                val command = CouponIssueCommand(userId, savedCoupon.id.value)
+                val command = CouponIssueCommand.of(userId, savedCoupon.id.value)
 
                 assertThrows<CouponAlreadyIssuedException> { couponUseCase.issueCoupon(command) }
             }
@@ -117,7 +117,7 @@ class CouponServiceIntegrationTest
                 val name = "TEST_COUPON"
                 val quantity = 10
                 val savedCoupon = couponRepository.save(Coupon.create(name, quantity))
-                val command = CouponIssueCommand(userId, savedCoupon.id.value)
+                val command = CouponIssueCommand.of(userId, savedCoupon.id.value)
 
                 val result = couponUseCase.issueCoupon(command)
 

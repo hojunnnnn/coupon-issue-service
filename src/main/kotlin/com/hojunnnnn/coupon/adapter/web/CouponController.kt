@@ -17,10 +17,7 @@ class CouponController(
     fun createCoupon(
         @RequestBody @Valid request: CouponCreateRequest,
     ): ResponseEntity<CouponCreateResponse> {
-        val command = CouponCreateCommand(
-            name = request.name,
-            quantity = request.quantity
-        )
+        val command = CouponCreateCommand.of(request.name,request.quantity)
         val response = couponUseCase.createCoupon(command)
         return ResponseEntity.ok(response)
     }
@@ -30,10 +27,7 @@ class CouponController(
         @RequestHeader(USER_ID_HEADER) userId: String,
         @PathVariable id: Long,
     ): ResponseEntity<CouponIssueResponse> {
-        val command = CouponIssueCommand(
-            userId = userId,
-            couponId = id
-        )
+        val command = CouponIssueCommand.of(userId,id)
         val response = couponUseCase.issueCoupon(command)
         return ResponseEntity.ok(response)
     }
@@ -42,9 +36,7 @@ class CouponController(
     fun issueEventCoupon(
         @RequestHeader(USER_ID_HEADER) userId: String,
     ): ResponseEntity<CouponIssueResponse> {
-        val command = EventCouponIssueCommand(
-            userId = userId
-        )
+        val command = EventCouponIssueCommand.of(userId)
         val response = couponUseCase.issueEventCoupon(command)
         return ResponseEntity.ok(response)
     }

@@ -86,7 +86,7 @@ class CouponServiceConcurrencyTest {
             executorService.submit {
                 try {
                     val userId = userIds[index]
-                    val command = CouponIssueCommand(userId, savedCoupon.id.value)
+                    val command = CouponIssueCommand.of(userId, savedCoupon.id.value)
 
                     val result = couponService.issueCoupon(command)
                     if (CouponStatus.ISSUED.name == result.couponStatus) {
@@ -134,7 +134,7 @@ class CouponServiceConcurrencyTest {
             executorService.submit {
                 try {
                     val userId = userIds[index]
-                    val command = EventCouponIssueCommand(userId)
+                    val command = EventCouponIssueCommand.of(userId)
 
                     val result = couponService.issueEventCoupon(command)
                     if (CouponStatus.ISSUED.name == result.couponStatus) {
@@ -176,8 +176,8 @@ class CouponServiceConcurrencyTest {
         val userA = "USER_A"
         val userB = "USER_B"
 
-        val commandA = CouponIssueCommand(userA, couponA.id.value)
-        val commandB = EventCouponIssueCommand(userB)
+        val commandA = CouponIssueCommand.of(userA, couponA.id.value)
+        val commandB = EventCouponIssueCommand.of(userB)
 
         // when
         executorService.submit {

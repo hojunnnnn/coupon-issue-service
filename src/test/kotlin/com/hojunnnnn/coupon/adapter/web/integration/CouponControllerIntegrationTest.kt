@@ -85,7 +85,7 @@ class CouponControllerIntegrationTest
 
             @Test
             fun `성공`() {
-                val coupon = couponUseCase.createCoupon(CouponCreateCommand("TEST_COUPON", 10))
+                val coupon = couponUseCase.createCoupon(CouponCreateCommand.of("TEST_COUPON", 10))
                 val userId = "user-1234"
                 val resultActions =
                     mockMvc.post("/api/v1/coupons/${coupon.id}/issue") {

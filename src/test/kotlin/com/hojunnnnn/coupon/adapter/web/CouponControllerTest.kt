@@ -36,7 +36,7 @@ class CouponControllerTest {
             val name = "TEST_COUPON"
             val quantity = 100
             val expiredDateTime = LocalDateTime.now().plusDays(7).truncatedTo(ChronoUnit.MILLIS)
-            val command = CouponCreateCommand(name, quantity)
+            val command = CouponCreateCommand.of(name, quantity)
 
             given(couponUseCase.createCoupon(command))
                 .willReturn(
